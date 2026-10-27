@@ -33,3 +33,4 @@ pl:
   label_cad_preview_original: "Oryginał"
   label_cad_preview_matte: "Matowy"
   label_cad_preview_studio: "Studio"
+  label_cad_preview_viewer_defaults: "Ustawienia domyślne podglądu 3D"

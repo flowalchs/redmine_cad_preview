@@ -16,6 +16,23 @@
 </p>
 
 <fieldset class="box">
+  <legend><%= l(:label_cad_preview_viewer_defaults) %></legend>
+  <% viewer_defaults = RedmineCadPreview::ViewerOptions.defaults %>
+  <p>
+    <%= label_tag 'settings_material_mode', l(:label_cad_preview_material_mode) %>
+    <%= select_tag 'settings[material_mode]',
+                   options_for_select(RedmineCadPreview::ViewerOptions.choices('material_mode'), viewer_defaults['material_mode']),
+                   :id => 'settings_material_mode' %>
+  </p>
+  <p>
+    <%= label_tag 'settings_lighting', l(:label_cad_preview_lighting) %>
+    <%= select_tag 'settings[lighting]',
+                   options_for_select(RedmineCadPreview::ViewerOptions.choices('lighting'), viewer_defaults['lighting']),
+                   :id => 'settings_lighting' %>
+  </p>
+</fieldset>
+
+<fieldset class="box">
   <legend><%= l(:label_cad_preview_dwg) %></legend>
   <p>
     <% if RedmineCadPreview::DwgConverter.available? %>

@@ -33,3 +33,4 @@ it:
   label_cad_preview_original: "Originale"
   label_cad_preview_matte: "Opaco"
   label_cad_preview_studio: "Studio"
+  label_cad_preview_viewer_defaults: "Valori predefiniti del visualizzatore 3D"

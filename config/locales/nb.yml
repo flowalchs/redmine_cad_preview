@@ -33,3 +33,4 @@ nb:
   label_cad_preview_original: "Original"
   label_cad_preview_matte: "Matt"
   label_cad_preview_studio: "Studio"
+  label_cad_preview_viewer_defaults: "Standardverdier for 3D-visningen"
