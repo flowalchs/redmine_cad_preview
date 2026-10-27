@@ -30,6 +30,8 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     end
     assert_select 'a[data-cad-action=fit]'
     assert_select 'a[data-cad-action=wireframe]'
+    assert_select 'select[data-cad-material-mode] option[selected]', :text => 'Original'
+    assert_select 'select[data-cad-lighting] option[selected]', :text => 'Studio'
     assert_select 'a[data-cad-action=measure-distance]'
     assert_select 'a[data-cad-action=measure-angle]'
     assert_select 'a.cad-preview-maximize[data-cad-action=maximize]'
@@ -41,6 +43,17 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 10
     assert_select '.cad-preview-info span.cad-preview-dimensions'
     assert_select 'script[type=module][src*=cad_preview]'
+  end
+
+  def test_show_should_use_the_material_and_lighting_of_the_settings
+    attachment = create_cad_attachment('model.step')
+
+    with_cad_settings({'material_mode' => 'matte', 'lighting' => 'original'}) do
+      get(:show, :params => {:id => attachment.id})
+    end
+    assert_select 'div.cad-preview[data-material-mode=matte][data-lighting=original]'
+    assert_select 'select[data-cad-material-mode] option[selected][value=matte]'
+    assert_select 'select[data-cad-lighting] option[selected][value=original]'
   end
 
   def test_show_should_include_measurement_labels
@@ -85,6 +98,8 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
       assert_equal 2, JSON.parse(element.first['data-fonts']).size
     end
     assert_select 'a[data-cad-action=wireframe]', 0
+    assert_select 'select[data-cad-material-mode]', 0
+    assert_select 'select[data-cad-lighting]', 0
     assert_select 'a[data-cad-action=measure-distance]'
     assert_select 'a[data-cad-action=measure-angle]'
   end
