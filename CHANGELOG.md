@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0 (2026-10-27)
+* feat: material (original or matte) and lighting (original or studio) in the toolbar of the 3D viewer, with the defaults in the plugin settings. The studio lighting adds reflections, so that metallic models are not displayed dark. Thanks to Txinto Vaz (cosmoBots) for the contribution (#2)
+* feat: JavaScript API for other plugins: `cad-preview:ready` and `cad-preview:error` events, `exportView()`, `restoreView()`, `setProjection()` and `getRenderContext()` (#2)
+* feat: other plugins can set the material and lighting of an attachment with `RedmineCadPreview::ViewerOptions.register`
+* test: tests of the viewer in `frontend/test`, run in CI
+
 ## v1.0.0 (2026-10-25)
 * First stable release, with all changes of the versions 0.1.0 to 0.3.0 below
 * fix: a test of an Inventor file could fail depending on the order of the tests
