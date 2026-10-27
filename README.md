@@ -1,46 +1,5 @@
 # Redmine CAD Preview Plugin
 
-## cosmoBots fork: studio lighting and material controls
-
-Development revision `1.0.1-cosmobots.1` adds procedural studio environment
-lighting (PMREM/RoomEnvironment, no external HDR downloads), essential for
-fully metallic glTF materials. Each 3D viewer offers Original/Matte material
-and Original/Studio lighting selectors. Matte clones preserve model colors,
-textures and transparency; switching back restores the original materials.
-Uploaded model files are never rewritten.
-
-Integrations can register initial defaults with
-`RedmineCadPreview::ViewerOptions.register(:integration) { |attachment| ... }`.
-Supported keys are `material_mode` (`original`/`matte`) and `lighting`
-(`studio`/`original`); values are allow-listed. The optional
-integration plugin can supply defaults via this API without duplicating
-viewer code. `cd frontend && npm ci && npm test && npm run build`
-rebuilds the bundled asset. No new npm dependencies or database migrations.
-
-Upstream: https://github.com/flowalchs/redmine_cad_preview. The original MIT
-license and author attribution remain intact.
-
-### Generic camera and rendering extension API
-
-After loading, a viewer element exposes `element.cadViewer` and dispatches the
-bubbling `cad-preview:ready` event with `detail.viewer`. For 3D models the API
-offers `exportView()`, `restoreView(state)`, `setProjection('perspective' |
-'orthographic')` and `getRenderContext()`. The latter exposes the canvas,
-renderer, scene (null for drawings) and a `render()` callback for integrations.
-It does not change the background or generate an editorial image.
-State schema version 1 includes camera
-position/target/up, projection/zoom/frustum, clipping planes, aspect, material,
-lighting, wireframe and background. `restoreView` restores the camera and
-appearance; the embedding integration must preserve the saved viewport aspect.
-Failed model loads set `element.cadError` and dispatch `cad-preview:error`,
-so integrations can keep their controls visible with a meaningful error.
-Editorial image capture, cropping, sizing, storage, authorization and report
-selection belong to the integration, not this fork. The DXF viewer also
-supports `exportView`, `restoreView` and `getRenderContext`: schema version 1 with
-`projection: 'drawing'`, scene `center`, `view_width` and viewport `aspect`.
-Regression tests run without WebGL
-for state handling, supplemented in csys by a real Chrome/WebGL smoke.
-
 [![build](https://github.com/flowalchs/redmine_cad_preview/actions/workflows/build.yml/badge.svg)](https://github.com/flowalchs/redmine_cad_preview/actions/workflows/build.yml)
 [![Last release](https://img.shields.io/github/v/release/flowalchs/redmine_cad_preview?label=latest%20release&logo=github&style=flat-square)](https://github.com/flowalchs/redmine_cad_preview/releases/latest)
 [![Rate at redmine.org](http://img.shields.io/badge/rate%20at-redmine.org-blue.svg?style=flat-square)](https://www.redmine.org/plugins/redmine_cad_preview)
@@ -64,11 +23,13 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
 - **File icons** – 3D models and 2D drawings get their own icons in the attachment lists, from Redmine 7.0 (which shows file type icons there). Redmine 7.0 only passes the content type, so only files with a CAD content type get the icons there, e.g. DWG, DXF, STL and IGES. Redmine trunk also passes the filename, so all CAD files get the icons. Icons of the theme are used first.
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
+- **Material and lighting** – 3D models can be shown with their original or with matte materials, and with the original lighting or studio lighting. The studio lighting adds reflections, so that metallic models (e.g. glTF) are not displayed dark. The file is not changed.
 - **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
 - **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library.
 - **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
-- **Settings** – Previewed formats, maximum file size, DWG converter command and timeout
+- **Settings** – Previewed formats, maximum file size, default material and lighting, DWG converter command and timeout
+- **API for other plugins** – Other plugins can set the material and lighting of an attachment, and save and restore the view of the viewer (see [API for other plugins](#-api-for-other-plugins))
 - **No migration and no additional gems**
 
 ## 📸 Screenshots
@@ -85,6 +46,8 @@ Configure the plugin under **Administration → Plugins → Redmine CAD Preview 
 | ----------------------------- | --------------------------------------------------------------------------- |
 | Previewed formats             | Formats shown in the viewer (default: all)                                  |
 | Maximum file size             | Larger files are not previewed (default: 50 MB). The file is loaded and converted to triangles in the browser, which needs a multiple of the file size in memory. On the server, the file is sent like a download, so the limit only matters for the DWG conversion, which runs as a separate process. |
+| Material                      | Material of 3D models when the preview is opened: original or matte (default: original) |
+| Lighting                      | Lighting of 3D models when the preview is opened: original or studio (default: original) |
 | dwg2dxf command (LibreDWG)    | Command of the DWG converter, e.g. `/usr/local/bin/dwg2dxf` (default: `dwg2dxf`) |
 | Conversion timeout            | Maximum time of a DWG conversion in seconds (default: 30)                   |
 
@@ -138,6 +101,42 @@ git clone https://github.com/flowalchs/redmine_cad_preview.git
 ```
 Restart your Redmine server to load the plugin. No database migration and no `bundle install` are needed, as the plugin has no Gemfile.
 
+## 🔌 API for other plugins
+
+### Material and lighting of an attachment
+
+Other plugins can set the material and lighting when the preview of an attachment is opened. The provider is called with the attachment and returns the options, which override the plugin settings:
+
+```ruby
+RedmineCadPreview::ViewerOptions.register(:my_plugin) do |attachment|
+  {'material_mode' => 'matte', 'lighting' => 'studio'}
+end
+```
+
+`material_mode` can be `original` or `matte`, `lighting` can be `original` or `studio`. Other keys and values are ignored. Register the provider in `after_plugins_loaded`, as this plugin can be loaded after yours.
+
+### JavaScript
+
+When the viewer has loaded the file, it sets `element.cadViewer` on the `[data-cad-preview]` element and dispatches the `cad-preview:ready` event (bubbling, with the viewer in `event.detail.viewer`). If the file cannot be loaded, it sets `element.cadError` and dispatches `cad-preview:error`.
+
+```js
+document.addEventListener('cad-preview:ready', (event) => {
+  const viewer = event.detail.viewer;
+  const state = viewer.exportView();
+  // ...
+  viewer.restoreView(state);
+});
+```
+
+| Method | Description |
+| --- | --- |
+| `exportView()` | Returns the current view as an object that can be saved as JSON. 3D models: camera (position, target, up, zoom, clipping planes), projection, viewport aspect, material, lighting, wireframe and background. Drawings: `projection: 'drawing'`, center, width of the view and viewport aspect. The object has `version: 1`. |
+| `restoreView(state)` | Restores a view returned by `exportView()`. The viewport should have the saved aspect, otherwise the view is cut or extended. |
+| `setProjection(mode)` | 3D models only: `'perspective'` (default) or `'orthographic'` |
+| `getRenderContext()` | Returns `canvas`, `renderer`, `scene` (`null` for drawings) and `render()`, e.g. to create an image of the view |
+
+The canvas has an alpha channel, so a plugin can remove the background (`scene.background = null`) to create images without background.
+
 ## 🧪 Tests
 
 ```bash
@@ -146,6 +145,8 @@ bundle exec rake redmine:plugins:test NAME=redmine_cad_preview RAILS_ENV=test
 ```
 
 With `COVERAGE=1`, a coverage report is created in `coverage/` (with `simplecov` of Redmine). The Cobertura report for Codecov is created only if `simplecov-cobertura` is installed, e.g. with `gem 'simplecov-cobertura'` in Redmine's `Gemfile.local`.
+
+The tests of the viewer in `frontend/test` run with Node.js and without WebGL (`cd frontend && npm test`).
 
 The tests use a stand-in for `dwg2dxf` (`test/support/fake_dwg2dxf`), so LibreDWG is not needed to run them. The test files with images are built with `test/support/build_fixtures.rb`.
 
@@ -156,6 +157,7 @@ The viewer is built from the sources in `frontend/` into `assets/`. The built fi
 ```bash
 cd frontend
 npm ci
+npm test
 npm run build
 ```
 
@@ -165,7 +167,7 @@ The versions are pinned in `frontend/package.json` (exact versions) and `fronten
 
 | Package | Used for | Included in the build |
 | --- | --- | --- |
-| `three` | 3D viewer, loaders for STL, OBJ, 3MF and glTF | `assets/javascripts/cad_preview.js` |
+| `three` | 3D viewer, loaders for STL, OBJ, 3MF and glTF, studio lighting | `assets/javascripts/cad_preview.js` |
 | `occt-import-js` | Reading STEP, IGES and BREP (WebAssembly) | `assets/javascripts/occt-import-js.{js,wasm}` |
 | `dxf-viewer` | DXF viewer (with `opentype.js`, `earcut`, `loglevel`) | `assets/javascripts/cad_preview.js` |
 | `@fontsource/noto-sans` | Font for texts in DXF drawings | `assets/fonts/` |
