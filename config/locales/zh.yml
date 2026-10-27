@@ -28,3 +28,8 @@ zh:
   text_cad_preview_solidworks_image: "SolidWorks 文件中保存的预览图像。如需以 3D 方式查看，请在 SolidWorks 中将模型导出为 STEP。"
   text_cad_preview_no_image: "该文件不包含预览图像。"
   text_cad_preview_solids: "该图纸包含无法在预览中显示的三维实体。"
+  label_cad_preview_material_mode: "材质"
+  label_cad_preview_lighting: "照明"
+  label_cad_preview_original: "原始"
+  label_cad_preview_matte: "哑光"
+  label_cad_preview_studio: "工作室"

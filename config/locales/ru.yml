@@ -28,3 +28,8 @@ ru:
   text_cad_preview_solidworks_image: "Изображение предварительного просмотра, сохранённое в файле SolidWorks. Чтобы просмотреть модель в 3D, экспортируйте её из SolidWorks в формат STEP."
   text_cad_preview_no_image: "Файл не содержит изображения предварительного просмотра."
   text_cad_preview_solids: "Чертёж содержит 3D-тела, которые невозможно отобразить в предварительном просмотре."
+  label_cad_preview_material_mode: "Материал"
+  label_cad_preview_lighting: "Освещение"
+  label_cad_preview_original: "Оригинал"
+  label_cad_preview_matte: "Матовый"
+  label_cad_preview_studio: "Студия"

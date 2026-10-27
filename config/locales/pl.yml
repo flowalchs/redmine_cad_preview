@@ -28,3 +28,8 @@ pl:
   text_cad_preview_solidworks_image: "Obraz podglądu zapisany w pliku SolidWorks. Aby wyświetlić model w 3D, wyeksportuj go z programu SolidWorks do formatu STEP."
   text_cad_preview_no_image: "Plik nie zawiera obrazu podglądu."
   text_cad_preview_solids: "Rysunek zawiera bryły 3D, których nie można wyświetlić w podglądzie."
+  label_cad_preview_material_mode: "Materiał"
+  label_cad_preview_lighting: "Oświetlenie"
+  label_cad_preview_original: "Oryginał"
+  label_cad_preview_matte: "Matowy"
+  label_cad_preview_studio: "Studio"

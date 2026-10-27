@@ -28,3 +28,8 @@ ja:
   text_cad_preview_solidworks_image: "SolidWorks ファイルに保存されたプレビュー画像です。3D で表示するには、SolidWorks でモデルを STEP 形式でエクスポートしてください。"
   text_cad_preview_no_image: "このファイルにはプレビュー画像が含まれていません。"
   text_cad_preview_solids: "この図面には、プレビューで表示できない 3D ソリッドが含まれています。"
+  label_cad_preview_material_mode: "マテリアル"
+  label_cad_preview_lighting: "照明"
+  label_cad_preview_original: "オリジナル"
+  label_cad_preview_matte: "マット"
+  label_cad_preview_studio: "スタジオ"

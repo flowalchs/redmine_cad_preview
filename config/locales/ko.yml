@@ -28,3 +28,8 @@ ko:
   text_cad_preview_solidworks_image: "SolidWorks 파일에 저장된 미리보기 이미지입니다. 3D로 보려면 SolidWorks에서 모델을 STEP으로 내보내세요."
   text_cad_preview_no_image: "파일에 미리보기 이미지가 없습니다."
   text_cad_preview_solids: "이 도면에는 미리보기에 표시할 수 없는 3D 솔리드가 포함되어 있습니다."
+  label_cad_preview_material_mode: "재질"
+  label_cad_preview_lighting: "조명"
+  label_cad_preview_original: "원본"
+  label_cad_preview_matte: "무광"
+  label_cad_preview_studio: "스튜디오"
