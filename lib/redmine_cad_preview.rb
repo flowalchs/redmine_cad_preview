@@ -38,7 +38,7 @@ module RedmineCadPreview
 
   DEFAULT_SETTINGS = {
     'material_mode' => 'original',
-    'lighting' => 'studio',
+    'lighting' => 'original',
     'formats' => FORMATS.keys,
     'max_file_size' => '50',
     'dwg2dxf_command' => 'dwg2dxf',

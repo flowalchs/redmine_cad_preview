@@ -13,7 +13,7 @@ class CadPreviewViewerOptionsTest < ActiveSupport::TestCase
 
   def test_defaults
     with_cad_settings({}) do
-      assert_equal({'material_mode' => 'original', 'lighting' => 'studio'},
+      assert_equal({'material_mode' => 'original', 'lighting' => 'original'},
                    RedmineCadPreview::ViewerOptions.for(Attachment.find(1)))
     end
   end
@@ -21,20 +21,20 @@ class CadPreviewViewerOptionsTest < ActiveSupport::TestCase
   def test_defaults_without_saved_options
     # Settings saved before the options were added
     with_settings(:plugin_redmine_cad_preview => {'formats' => ['step']}) do
-      assert_equal({'material_mode' => 'original', 'lighting' => 'studio'}, RedmineCadPreview::ViewerOptions.defaults)
+      assert_equal({'material_mode' => 'original', 'lighting' => 'original'}, RedmineCadPreview::ViewerOptions.defaults)
     end
   end
 
   def test_options_of_the_settings
-    with_cad_settings({'material_mode' => 'matte', 'lighting' => 'original'}) do
-      assert_equal({'material_mode' => 'matte', 'lighting' => 'original'},
+    with_cad_settings({'material_mode' => 'matte', 'lighting' => 'studio'}) do
+      assert_equal({'material_mode' => 'matte', 'lighting' => 'studio'},
                    RedmineCadPreview::ViewerOptions.for(Attachment.find(1)))
     end
   end
 
   def test_invalid_options_of_the_settings_should_be_ignored
-    with_cad_settings({'material_mode' => 'shiny', 'lighting' => 'original'}) do
-      assert_equal({'material_mode' => 'original', 'lighting' => 'original'}, RedmineCadPreview::ViewerOptions.defaults)
+    with_cad_settings({'material_mode' => 'shiny', 'lighting' => 'studio'}) do
+      assert_equal({'material_mode' => 'original', 'lighting' => 'studio'}, RedmineCadPreview::ViewerOptions.defaults)
     end
   end
 
@@ -45,19 +45,19 @@ class CadPreviewViewerOptionsTest < ActiveSupport::TestCase
       {:material_mode => 'matte'}
     end
 
-    with_cad_settings({'lighting' => 'original'}) do
-      assert_equal({'material_mode' => 'matte', 'lighting' => 'original'},
+    with_cad_settings({'lighting' => 'studio'}) do
+      assert_equal({'material_mode' => 'matte', 'lighting' => 'studio'},
                    RedmineCadPreview::ViewerOptions.for(attachment))
     end
   end
 
   def test_invalid_options_of_a_provider_should_be_ignored
     RedmineCadPreview::ViewerOptions.register(:test) do |_attachment|
-      {'material_mode' => 'shiny', 'lighting' => 'original', 'background' => '#000000'}
+      {'material_mode' => 'shiny', 'lighting' => 'studio', 'background' => '#000000'}
     end
 
     with_cad_settings({'material_mode' => 'matte'}) do
-      assert_equal({'material_mode' => 'matte', 'lighting' => 'original'},
+      assert_equal({'material_mode' => 'matte', 'lighting' => 'studio'},
                    RedmineCadPreview::ViewerOptions.for(Attachment.find(1)))
     end
   end
@@ -72,6 +72,6 @@ class CadPreviewViewerOptionsTest < ActiveSupport::TestCase
 
   def test_choices
     assert_equal [%w[Original original], %w[Matte matte]], RedmineCadPreview::ViewerOptions.choices('material_mode')
-    assert_equal [%w[Studio studio], %w[Original original]], RedmineCadPreview::ViewerOptions.choices('lighting')
+    assert_equal [%w[Original original], %w[Studio studio]], RedmineCadPreview::ViewerOptions.choices('lighting')
   end
 end

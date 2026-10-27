@@ -359,7 +359,7 @@ class ModelViewer {
     this.camera.add(new THREE.DirectionalLight(0xffffff, 1.5));
     this.scene.add(this.camera);
     this.studioLighting = new StudioLighting(this.renderer, this.scene);
-    this.studioLighting.apply(element.dataset.lighting || 'studio');
+    this.studioLighting.apply(element.dataset.lighting || 'original');
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;

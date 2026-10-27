@@ -5,8 +5,8 @@ module RedmineCadPreview
   # plugin settings, and other plugins can override them per attachment with a
   # provider. Only the values in CHOICES are used.
   module ViewerOptions
-    DEFAULTS = {'material_mode' => 'original', 'lighting' => 'studio'}.freeze
-    CHOICES = {'material_mode' => %w[original matte], 'lighting' => %w[studio original]}.freeze
+    DEFAULTS = {'material_mode' => 'original', 'lighting' => 'original'}.freeze
+    CHOICES = {'material_mode' => %w[original matte], 'lighting' => %w[original studio]}.freeze
 
     class << self
       # Registers a provider, which returns the options for an attachment, e.g.

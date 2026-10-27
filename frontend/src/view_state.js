@@ -9,7 +9,7 @@ export function readView(viewer) {
     frustum_height: camera.isOrthographicCamera ? camera.top - camera.bottom : 1,
     aspect: viewer.canvas.width / viewer.canvas.height,
     material: viewer.element.dataset.materialMode || 'original',
-    lighting: viewer.element.dataset.lighting || 'studio',
+    lighting: viewer.element.dataset.lighting || 'original',
     background: `#${viewer.scene.background.getHexString()}`, wireframe: viewer.wireframe
   };
 }

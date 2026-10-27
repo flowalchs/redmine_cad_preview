@@ -31,7 +31,7 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'a[data-cad-action=fit]'
     assert_select 'a[data-cad-action=wireframe]'
     assert_select 'select[data-cad-material-mode] option[selected]', :text => 'Original'
-    assert_select 'select[data-cad-lighting] option[selected]', :text => 'Studio'
+    assert_select 'select[data-cad-lighting] option[selected]', :text => 'Original'
     assert_select 'a[data-cad-action=measure-distance]'
     assert_select 'a[data-cad-action=measure-angle]'
     assert_select 'a.cad-preview-maximize[data-cad-action=maximize]'
@@ -48,12 +48,12 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
   def test_show_should_use_the_material_and_lighting_of_the_settings
     attachment = create_cad_attachment('model.step')
 
-    with_cad_settings({'material_mode' => 'matte', 'lighting' => 'original'}) do
+    with_cad_settings({'material_mode' => 'matte', 'lighting' => 'studio'}) do
       get(:show, :params => {:id => attachment.id})
     end
-    assert_select 'div.cad-preview[data-material-mode=matte][data-lighting=original]'
+    assert_select 'div.cad-preview[data-material-mode=matte][data-lighting=studio]'
     assert_select 'select[data-cad-material-mode] option[selected][value=matte]'
-    assert_select 'select[data-cad-lighting] option[selected][value=original]'
+    assert_select 'select[data-cad-lighting] option[selected][value=studio]'
   end
 
   def test_show_should_include_measurement_labels
