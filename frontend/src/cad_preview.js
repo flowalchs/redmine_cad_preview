@@ -410,6 +410,8 @@ class ModelViewer {
     if (this.frame || !this.object) return;
     this.frame = requestAnimationFrame(() => {
       this.frame = null;
+      // The image of the view covers the canvas until the view is restored
+      if (hasPlaceholder(this.element)) return;
       this.controls.update();
       this.render();
       this.measurement?.update();
@@ -621,6 +623,22 @@ class DrawingViewer {
       retainParsedDxf: true
     });
     this.viewer.Subscribe('viewChanged', () => this.measurement?.update());
+    // dxf-viewer renders the whole drawing at once on each change of the
+    // view, several times when a drawing is loaded or a view is restored,
+    // which blocks the page with large drawings. Its renders are combined
+    // into one per frame. render() renders at once, for the images.
+    this.renderNow = this.viewer.Render.bind(this.viewer);
+    this.viewer.Render = () => this.requestRender();
+  }
+
+  // Renders the drawing in the next frame, not while the image of the view
+  // covers it
+  requestRender() {
+    if (this.frame) return;
+    this.frame = requestAnimationFrame(() => {
+      this.frame = null;
+      if (!hasPlaceholder(this.element)) this.renderNow();
+    });
   }
 
   get canvas() {
@@ -662,7 +680,7 @@ class DrawingViewer {
   }
 
   render() {
-    this.viewer.Render();
+    this.renderNow();
   }
 
   // Draws the current view without background on a 2D context
@@ -698,13 +716,17 @@ class DrawingViewer {
     const container = this.element.querySelector('.cad-preview-canvas');
     this.viewer.SetSize(container.clientWidth, container.clientHeight);
     this.viewer.SetView({ x: state.center[0], y: state.center[1] }, state.view_width);
-    this.render();
   }
 
   getRenderContext() {
     return { canvas: this.canvas, renderer: this.viewer.GetRenderer(), scene: null,
              render: () => this.render() };
   }
+}
+
+// True while the image of the view is shown, until the viewer is ready
+function hasPlaceholder(element) {
+  return !!element.querySelector('.cad-preview-placeholder');
 }
 
 // Draws the current view with the measurement and a caption (file name,
@@ -973,8 +995,10 @@ async function initialize(element) {
       // The viewer can be used without the saved views
       await views.load().catch((error) => console.error('CAD preview views:', error));
     }
-    // The image of the view is replaced by the viewer
+    // The image of the view is replaced by the viewer, which renders the
+    // view only now
     element.querySelector('.cad-preview-placeholder')?.remove();
+    viewer.requestRender();
     element.cadViewer = viewer;
     element.dispatchEvent(new CustomEvent('cad-preview:ready', { bubbles: true, detail: { viewer } }));
     if (element.dataset.snapshotUrl && !viewer.mostlySolids) {

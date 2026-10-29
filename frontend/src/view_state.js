@@ -36,5 +36,7 @@ export function applyView(viewer, state) {
   viewer.resize();
   viewer.controls.update();
   viewer.controls.enableDamping = damping;
-  viewer.render();
+  // The viewer renders in the next frame, if it can
+  if (viewer.requestRender) viewer.requestRender();
+  else viewer.render();
 }

@@ -17,6 +17,7 @@
 * perf: the 3D view is rendered only when it changes, instead of continuously, and the viewers of a page are started one after another, so that pages with several viewers stay responsive (#3)
 * perf: DXF and DWG drawings are parsed in a worker, so that large drawings do not block the page and the other viewers
 * perf: STEP, IGES and BREP files are read in a worker
+* perf: large drawings are rendered once when they are loaded or a view is restored, instead of several times, which made the browser report that the page is not responding
 * perf: the WebAssembly file of the STEP, IGES and BREP reader is loaded only once, also if the server does not send it as application/wasm
 * chore: the plugin has a database migration
 
