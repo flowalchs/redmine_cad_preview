@@ -27,6 +27,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Saved views** – Save the current view (camera, material, lighting, wireframe) under a name, e.g. `front` or `detail`, and restore it from the toolbar. The default view of an attachment is restored when the preview is opened, and its image is the thumbnail of the attachment. Each view is saved with an image without background, cropped to the model or drawing. For 3D models and 2D drawings, in issues, documents, files, wiki pages and news.
 - **Material and lighting** – 3D models can be shown with their original or with matte materials, and with the original lighting or studio lighting. The studio lighting adds reflections, so that metallic models (e.g. glTF) are not displayed dark. The file is not changed.
 - **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
+- **Macro** – Shows the viewer of an attachment in wiki pages, issues, documents and news, with a saved view, all saved views, or the images of the views (see [Macro](#-macro))
 - **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library. The file name contains the name of the saved view if the view has not been changed.
 - **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
@@ -54,6 +55,29 @@ Configure the plugin under **Administration → Plugins → Redmine CAD Preview 
 | Conversion timeout            | Maximum time of a DWG conversion in seconds (default: 30)                   |
 
 The settings page shows whether the DWG converter is available. Without it, DWG files are not previewed, and all other formats still work.
+
+## 📝 Macro
+
+The macro `cad_preview` shows the viewer of a CAD attachment in wiki pages, issues, notes, documents, news and other texts:
+
+```
+{{cad_preview(model.step)}}
+{{cad_preview(123, view=front, height=420)}}
+{{cad_preview(model.step, view=*)}}
+{{cad_preview(model.step, view=front, png)}}
+```
+
+| Parameter | Description |
+| --- | --- |
+| attachment | File name of an attachment of the page, issue or document (like the `thumbnail` macro of Redmine), or the ID of any attachment |
+| `view=name` | The saved view with this name. Without `view`, the default view is shown, or the whole model if the attachment has no default view. A view that does not exist shows an error, it is not replaced by another view. |
+| `view=*` | All saved views of the attachment, one below the other |
+| `height=520` | Height of the viewer in pixels, from 240 to 1200 (default: 520). With `png`, the maximum height of the images, from 16 to 1200. |
+| `png` | The images of the views instead of the viewer, without JavaScript. Without default view, the thumbnail of the attachment is shown. |
+
+The viewer in the macro has the same toolbar as the preview of the attachment, with icons only. The views can be restored and, with the permissions, saved and deleted. The viewers are loaded when they become visible, so that a page with many viewers does not load all files at once.
+
+In the PDF export of issues and wiki pages, in emails and in Atom feeds, the macro shows the images of the views, as no viewer can be shown there. Without default view, it shows the thumbnail of the attachment (the image saved in the file or the snapshot of the viewer). The attachment must be visible to the user, otherwise the macro shows an error.
 
 ## 🔐 Permissions
 
