@@ -368,9 +368,23 @@ class ModelViewer {
     this.setMaterialMode(this.element.dataset.materialMode || 'original');
     this.scene.add(this.object);
     this.fit();
-    this.renderer.setAnimationLoop(() => {
+    // The shaders are compiled in parallel where the browser supports it, so
+    // that the first frame does not block the page
+    await this.renderer.compileAsync(this.scene, this.camera).catch(() => {});
+    this.controls.addEventListener('change', () => this.requestRender());
+    this.requestRender();
+  }
+
+  // Renders the view in the next frame. The view is rendered only when it
+  // changes, so that a page with several viewers stays responsive. While the
+  // camera moves on after dragging (damping), the controls report changes
+  // and the view is rendered again.
+  requestRender() {
+    if (this.frame || !this.object) return;
+    this.frame = requestAnimationFrame(() => {
+      this.frame = null;
       this.controls.update();
-      this.renderer.render(this.scene, this.camera);
+      this.render();
       this.measurement?.update();
     });
   }
@@ -437,11 +451,13 @@ class ModelViewer {
     this.object?.traverse((mesh) => {
       if (mesh.isMesh) for (const material of [].concat(mesh.material)) material.wireframe = this.wireframe;
     });
+    this.requestRender();
   }
 
   setLighting(mode) {
     this.element.dataset.lighting = mode;
     this.studioLighting.apply(mode);
+    this.requestRender();
   }
 
   setProjection(mode, frustumHeight) {
@@ -541,6 +557,7 @@ class ModelViewer {
       if (!child.isMesh) return;
       for (const material of [].concat(child.material)) material.wireframe = this.wireframe;
     });
+    this.requestRender();
   }
 
   resize() {
@@ -556,6 +573,8 @@ class ModelViewer {
     }
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    // Resizing clears the canvas
+    this.requestRender();
   }
 }
 
@@ -937,12 +956,17 @@ async function initialize(element) {
   }
 }
 
-// Viewers in wiki pages and issues are loaded when they become visible, so
-// that a page with many viewers does not load all files at once
+// Viewers in wiki pages and issues are loaded when they become visible, one
+// after the other, so that a page with many viewers does not load all files
+// at once and the page can be used in between
+let queue = Promise.resolve();
 const visibility = new IntersectionObserver((entries) => {
   entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
     visibility.unobserve(entry.target);
-    initialize(entry.target);
+    queue = queue.then(() => new Promise((resolve) => setTimeout(resolve)))
+      .then(() => initialize(entry.target))
+      // A viewer that cannot be created (e.g. without WebGL) does not stop the others
+      .catch((error) => console.error('CAD preview:', error));
   });
 }, { rootMargin: '200px' });
 

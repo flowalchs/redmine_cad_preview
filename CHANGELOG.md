@@ -14,6 +14,7 @@
 * feat: the downloaded PNG and PDF files get the name of the view if the view has not been changed
 * feat: the buttons of the toolbar are grouped, and the downloads are aligned to the right
 * feat: reverting the migration when the plugin is uninstalled deletes the saved views and the converted DWG files
+* perf: the 3D view is rendered only when it changes, instead of continuously, and the viewers of a page are started one after another, so that pages with several viewers stay responsive (#3)
 * perf: DXF and DWG drawings are parsed in a worker, so that large drawings do not block the page and the other viewers
 * perf: the WebAssembly file of the STEP, IGES and BREP reader is loaded only once, also if the server does not send it as application/wasm
 * chore: the plugin has a database migration
