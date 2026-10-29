@@ -22,3 +22,11 @@ DxfParser.prototype.registerEntityHandler = function register(handlerType) {
     if (!this._entityHandlers[handler.ForEntityName]) registerEntityHandler.call(this, handler);
   }
 };
+
+// Returns the unit and the numbers of entities and of 3D solids of a parsed
+// DXF file
+export function summarizeDxf(dxf) {
+  const entities = dxf?.entities || [];
+  return { units: dxf?.header?.$INSUNITS, entities: entities.length,
+           solids: entities.filter((entity) => SOLID_TYPES.includes(entity.type)).length };
+}

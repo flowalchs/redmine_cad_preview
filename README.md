@@ -236,7 +236,7 @@ The versions are pinned in `frontend/package.json` (exact versions) and `fronten
 | Package | Used for | Included in the build |
 | --- | --- | --- |
 | `three` | 3D viewer, loaders for STL, OBJ, 3MF and glTF, studio lighting | `assets/javascripts/cad_preview.js` |
-| `occt-import-js` | Reading STEP, IGES and BREP (WebAssembly) | `assets/javascripts/occt-import-js.{js,wasm}` |
+| `occt-import-js` | Reading STEP, IGES and BREP (WebAssembly), in a worker (`assets/javascripts/cad_preview_occt_worker.js`) | `assets/javascripts/occt-import-js.{js,wasm}` |
 | `@hotwired/stimulus` | Suggestions of file names for the macro, provided by Redmine (not included) | `assets/javascripts/cad_preview_autocomplete.js` |
 | `dxf-viewer` | DXF viewer (with `opentype.js`, `earcut`, `loglevel`) | `assets/javascripts/cad_preview.js`, `assets/javascripts/cad_preview_dxf_worker.js` (parsing in a worker) |
 | `@fontsource/noto-sans` | Font for texts in DXF drawings | `assets/fonts/` |

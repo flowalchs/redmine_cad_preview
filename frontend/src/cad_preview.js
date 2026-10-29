@@ -7,6 +7,7 @@
 //                     dae, fbx, vrml, amf, 3ds or dxf
 //   data-occt-script  URL of occt-import-js.js (STEP, IGES, BREP and FreeCAD only)
 //   data-occt-wasm    URL of occt-import-js.wasm (STEP, IGES, BREP and FreeCAD only)
+//   data-occt-worker  URL of the worker that reads STEP, IGES and BREP files
 //   data-fonts        JSON array of font URLs (DXF only)
 //   data-dxf-worker   URL of the worker that parses DXF files (DXF only)
 //   data-error        Message shown when the file cannot be displayed
@@ -39,7 +40,7 @@ import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
 import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
 import { strFromU8, unzipSync } from 'three/addons/libs/fflate.module.js';
 import { DxfViewer } from 'dxf-viewer';
-import { SOLID_TYPES } from './dxf_solids.js';
+import { summarizeDxf } from './dxf_solids.js';
 
 const Z_UP_FORMATS = ['step', 'iges', 'brep', 'freecad', 'stl', '3mf', 'amf', '3ds'];
 const OCCT_FORMATS = { step: 'ReadStepFile', iges: 'ReadIgesFile', brep: 'ReadBrepFile' };
@@ -76,8 +77,34 @@ function loadScript(src) {
   });
 }
 
+// STEP, IGES and BREP files are read in a worker, which is shared by the
+// viewers of the page. The requests are answered in their order.
+let occtWorker = null;
+let occtRequest = 0;
+const occtRequests = new Map();
+
+function readInWorker(element, method, buffer) {
+  if (!occtWorker) {
+    occtWorker = new Worker(element.dataset.occtWorker);
+    occtWorker.onmessage = ({ data }) => {
+      const request = occtRequests.get(data.id);
+      occtRequests.delete(data.id);
+      if (data.error) request.reject(new Error(data.error));
+      else request.resolve(data.result);
+    };
+  }
+  const id = ++occtRequest;
+  const absolute = (url) => new URL(url, window.location.href).href;
+  return new Promise((resolve, reject) => {
+    occtRequests.set(id, { resolve, reject });
+    occtWorker.postMessage({ id, method, buffer, script: absolute(element.dataset.occtScript),
+                             wasm: absolute(element.dataset.occtWasm) }, [buffer]);
+  });
+}
+
+// occt-import-js in the page, for FreeCAD documents and without the worker.
 // The WebAssembly file is loaded here, as the browser loads it twice if the
-// server does not send it as application/wasm
+// server does not send it as application/wasm.
 function loadOcct(scriptUrl, wasmUrl) {
   if (!occtPromise) {
     occtPromise = Promise.all([loadScript(scriptUrl), fetchFile(wasmUrl)])
@@ -437,8 +464,13 @@ class ModelViewer {
       default: {
         const method = OCCT_FORMATS[this.format];
         if (!method) throw new Error(`Unsupported format: ${this.format}`);
-        const occt = await loadOcct(this.element.dataset.occtScript, this.element.dataset.occtWasm);
-        const result = occt[method](new Uint8Array(buffer), null);
+        let result;
+        if (this.element.dataset.occtWorker) {
+          result = await readInWorker(this.element, method, buffer);
+        } else {
+          const occt = await loadOcct(this.element.dataset.occtScript, this.element.dataset.occtWasm);
+          result = occt[method](new Uint8Array(buffer), null);
+        }
         if (!result.success || result.meshes.length === 0) throw new Error('The file could not be read');
         return occtResultToObject(result);
       }
@@ -602,12 +634,13 @@ class DrawingViewer {
       fonts: JSON.parse(this.element.dataset.fonts || '[]'),
       workerFactory: worker ? () => new Worker(worker) : null
     });
+    // The worker sends only the summary of the parsed file
     const dxf = this.viewer.GetDxf();
-    this.unit = DXF_UNITS[dxf?.header?.$INSUNITS];
-    const entities = dxf?.entities || [];
-    this.solids = entities.filter((entity) => SOLID_TYPES.includes(entity.type)).length;
+    const summary = dxf?.summary || summarizeDxf(dxf);
+    this.unit = DXF_UNITS[summary.units];
+    this.solids = summary.solids;
     // A drawing made mostly of 3D solids looks empty in the viewer
-    this.mostlySolids = this.solids > 0 && this.solids >= entities.length - this.solids;
+    this.mostlySolids = this.solids > 0 && this.solids >= summary.entities - this.solids;
     this.fit();
   }
 

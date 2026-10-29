@@ -56,6 +56,7 @@
        <% if RedmineCadPreview::OCCT_FORMATS.include?(format) %>
        data-occt-script="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.js') %>"
        data-occt-wasm="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.wasm') %>"
+       data-occt-worker="<%= asset_path('plugin_assets/redmine_cad_preview/cad_preview_occt_worker.js') %>"
        <% end %>
        <% if format == 'dxf' %>
        data-fonts="<%= %w[latin latin-ext].map {|s| asset_path("plugin_assets/redmine_cad_preview/noto-sans-#{s}-400-normal.woff")}.to_json %>"

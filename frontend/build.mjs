@@ -36,6 +36,17 @@ await esbuild.build({
   outfile: `${assets}javascripts/cad_preview_autocomplete.js`
 });
 
+// Worker that reads STEP, IGES and BREP files with occt-import-js, which it
+// loads itself
+await esbuild.build({
+  entryPoints: ['src/occt_worker.js'],
+  bundle: true,
+  format: 'iife',
+  target: 'es2020',
+  minify: true,
+  outfile: `${assets}javascripts/cad_preview_occt_worker.js`
+});
+
 // Worker that parses DXF files
 await esbuild.build({
   entryPoints: ['src/dxf_worker.js'],
