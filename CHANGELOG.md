@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.1 (unreleased)
+* feat: saved views of CAD attachments: save the current view under a name and restore it from the toolbar, for 3D models and 2D drawings (#3)
+* feat: the default view is restored when the preview is opened, and its image is the thumbnail of the attachment (#3)
+* feat: each view is saved with an image without background, cropped to the model or drawing, which can be downloaded with the attachments API of Redmine (#3)
+* feat: permissions to save views of own attachments or of all attachments (#3)
+* feat: views in Ruby (`RedmineCadPreview::Views`) and with the REST API, with a conflict instead of overwriting a view changed in the meantime (#3)
+* feat: the downloaded PNG and PDF files get the name of the view if the view has not been changed
+* feat: the buttons of the toolbar are grouped, and the downloads are aligned to the right
+* feat: reverting the migration when the plugin is uninstalled deletes the saved views and the converted DWG files
+* chore: the plugin has a database migration
+
 ## v1.1.0 (2026-10-27)
 * feat: material (original or matte) and lighting (original or studio) in the toolbar of the 3D viewer, with the defaults in the plugin settings. The studio lighting adds reflections, so that metallic models are not displayed dark. Thanks to Txinto Vaz (cosmoBots) for the contribution (#2)
 * feat: JavaScript API for other plugins: `cad-preview:ready` and `cad-preview:error` events, `exportView()`, `restoreView()`, `setProjection()` and `getRenderContext()` (#2)
