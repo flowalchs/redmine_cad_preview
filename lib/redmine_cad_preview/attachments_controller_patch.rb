@@ -8,8 +8,10 @@ module RedmineCadPreview
         @cad_format = RedmineCadPreview.format_of(@attachment.filename)
         # The image is read here for files uploaded before the plugin was installed
         @cad_image = RedmineCadPreview::PreviewImage.extract(@attachment)
+        # The snapshot is not needed for the thumbnail if the attachment has an
+        # image or a default view
         @cad_snapshot = @cad_image.nil? && RedmineCadPreview::PreviewImage.path(@attachment).nil? &&
-                        @attachment.editable?
+                        RedmineCadPreview::Views.default(@attachment).nil? && @attachment.editable?
         render :action => 'cad_preview'
         return
       end

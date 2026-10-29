@@ -30,6 +30,7 @@ class CadPreviewView < ApplicationRecord
   before_save :set_attachment_digest, :if => -> { new_image || will_save_change_to_state? }
   after_save :unset_other_defaults, :if => :is_default?
   after_save :save_image, :if => :new_image
+  after_commit :delete_thumbnails
 
   scope :sorted, -> { order(:name) }
   scope :named, ->(name) { where(:name => normalize_name(name)) }
@@ -154,6 +155,13 @@ class CadPreviewView < ApplicationRecord
     old_image&.destroy!
     @image_data = @new_image = nil
     reload_image
+  end
+
+  # Deletes the thumbnails of the attachment made from its default view, which
+  # are made again when needed
+  def delete_thumbnails
+    pattern = "#{attachment.digest}_#{attachment.filesize}_view*.thumb"
+    FileUtils.rm_f(Dir.glob(File.join(Attachment.thumbnails_storage_path, pattern)))
   end
 
   def unset_other_defaults

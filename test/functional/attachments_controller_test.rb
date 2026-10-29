@@ -203,6 +203,16 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'div.cad-preview:not([data-snapshot-url])'
   end
 
+  def test_show_should_not_request_snapshot_for_attachment_with_default_view
+    attachment = create_cad_attachment('model.step')
+    RedmineCadPreview::Views.save(attachment, 'front', :user => User.find(2),
+                                                       :state => {'version' => 1, 'projection' => 'perspective'},
+                                                       :image => png_image)
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview:not([data-snapshot-url])'
+  end
+
   def test_show_should_not_request_snapshot_from_user_who_cannot_edit
     attachment = create_cad_attachment('model.step')
     @request.session[:user_id] = nil
