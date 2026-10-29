@@ -56,13 +56,39 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'select[data-cad-lighting] option[selected][value=studio]'
   end
 
+  def test_show_should_include_the_saved_views
+    attachment = create_cad_attachment('model.step')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview[data-views-url=?]', "/cad_previews/#{attachment.id}/views" do |element|
+      i18n = JSON.parse(element.first['data-i18n'])
+      assert_equal 'Delete the view "%{name}"?', i18n['view_confirm_delete']
+    end
+    assert_select 'select[data-cad-view]'
+    assert_select 'a[data-cad-action=save-view]', 0
+    assert_select 'form.cad-preview-view-form', 0
+  end
+
+  def test_show_should_include_the_form_to_save_views_with_permission
+    Role.find(1).add_permission!(:save_cad_preview_views)
+    attachment = create_cad_attachment('drawing.dxf')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'a[data-cad-action=save-view]'
+    assert_select 'a[data-cad-action=delete-view][hidden]'
+    assert_select 'form.cad-preview-view-form[hidden]' do
+      assert_select 'input[name=name][pattern]'
+      assert_select 'input[type=checkbox][name=is_default]'
+    end
+  end
+
   def test_show_should_include_measurement_labels
     attachment = create_cad_attachment('model.step')
 
     get(:show, :params => {:id => attachment.id})
     assert_select 'div.cad-preview[data-i18n]' do |element|
       i18n = JSON.parse(element.first['data-i18n'])
-      assert_equal %w[angle dimensions distance solids units], i18n.keys.sort
+      assert_equal %w[angle dimensions distance solids units], i18n.keys.grep_v(/\Aview_/).sort
       assert_equal 'Distance', i18n['distance']
     end
   end

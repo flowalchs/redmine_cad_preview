@@ -2,8 +2,33 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 6px 10px;
   margin-block-end: 4px;
+}
+
+/* Groups of buttons, separated by a line */
+.cad-preview-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cad-preview-toolbar-group + .cad-preview-toolbar-group {
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid #dee2e6;
+}
+
+/* No line before a group at the start of a line (see markLineStarts) */
+.cad-preview-toolbar-group.cad-preview-line-start {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+}
+
+/* The downloads are aligned to the right, like the download of the file */
+.cad-preview-toolbar-group.cad-preview-downloads {
+  margin-inline-start: auto;
+  padding-inline-start: 0;
+  border-inline-start: 0;
 }
 
 .cad-preview-toolbar a.selected {
@@ -154,4 +179,33 @@ body.cad-preview-maximized-body {
   block-size: 100%;
   object-fit: scale-down;
   background: #fff;
+}
+
+/* Saved views */
+.cad-preview-view-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-block-end: 6px;
+  padding: 6px 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+}
+
+.cad-preview-view-form[hidden],
+.cad-preview-toolbar [hidden] {
+  display: none;
+}
+
+.cad-preview-view-notice {
+  color: #2b8a3e;
+}
+
+.cad-preview-view-warning {
+  color: #e67700;
+}
+
+.cad-preview-view-error {
+  color: #c92a2a;
 }

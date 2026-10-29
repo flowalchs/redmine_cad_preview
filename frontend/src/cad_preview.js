@@ -15,10 +15,12 @@
 //                     attachments without thumbnail and users who can edit them)
 //   data-image-url    URL of the image saved in the file (DXF, DWG), shown for
 //                     drawings of 3D solids
+//   data-views-url    URL of the saved views (see saved_views.js)
 
 import * as THREE from 'three';
 import { ModelAppearance, StudioLighting } from './model_appearance.js';
 import { readView, applyView } from './view_state.js';
+import { SavedViews } from './saved_views.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -513,6 +515,16 @@ class ModelViewer {
     this.renderer.render(this.scene, this.camera);
   }
 
+  // Draws the current view without background on a 2D context
+  drawTransparent(context) {
+    const background = this.scene.background;
+    this.scene.background = null;
+    this.render();
+    context.drawImage(this.canvas, 0, 0);
+    this.scene.background = background;
+    this.render();
+  }
+
   // Moves the camera so that the whole model is visible
   fit() {
     if (!this.object) return;
@@ -612,6 +624,16 @@ class DrawingViewer {
 
   render() {
     this.viewer.Render();
+  }
+
+  // Draws the current view without background on a 2D context
+  drawTransparent(context) {
+    const renderer = this.viewer.GetRenderer();
+    renderer.setClearAlpha(0);
+    this.render();
+    context.drawImage(this.canvas, 0, 0);
+    renderer.setClearAlpha(1);
+    this.render();
   }
 
   // The bounds are in drawing coordinates, the view in scene coordinates
@@ -740,9 +762,11 @@ function saveBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function downloadView(element, viewer, measurement, type) {
+// The name of the saved view is added to the file name if the view has not
+// been changed since it was restored or saved
+async function downloadView(element, viewer, measurement, type, viewName) {
   const canvas = captureView(element, viewer, measurement);
-  const basename = (element.dataset.filename || 'cad-preview').replace(/\.[^.]+$/, '');
+  const basename = (element.dataset.filename || 'cad-preview').replace(/\.[^.]+$/, '') + (viewName ? `-${viewName}` : '');
   if (type === 'pdf') {
     saveBlob(await canvasToPdf(canvas), `${basename}.pdf`);
   } else {
@@ -818,6 +842,21 @@ function toggleFullscreen(element) {
   }
 }
 
+// Marks the groups of the toolbar that start a new line, which have no line
+// before them
+function markLineStarts(toolbar) {
+  const update = () => {
+    let bottom = null;
+    toolbar.querySelectorAll('.cad-preview-toolbar-group').forEach((group) => {
+      // Groups of the same line overlap vertically, even with different heights
+      group.classList.toggle('cad-preview-line-start', bottom !== null && group.offsetTop >= bottom);
+      bottom = group.offsetTop + group.offsetHeight;
+    });
+  };
+  new ResizeObserver(update).observe(toolbar);
+  update();
+}
+
 function showDimensions(element, viewer, i18n) {
   const dimensions = viewer.dimensions();
   if (!dimensions) return;
@@ -844,8 +883,10 @@ async function initialize(element) {
   const i18n = JSON.parse(element.dataset.i18n || '{}');
   const viewer = element.dataset.format === 'dxf' ? new DrawingViewer(element) : new ModelViewer(element);
   const measurement = new Measurement(viewer, element, i18n);
+  let views = null;
 
   if (readMaximized()) setMaximized(element, true);
+  markLineStarts(element.querySelector('.cad-preview-toolbar'));
 
   const actions = {
     fit: () => viewer.fit(),
@@ -854,8 +895,8 @@ async function initialize(element) {
     'measure-angle': () => measurement.toggle('angle'),
     maximize: () => setMaximized(element, !element.classList.contains('cad-preview-maximized')),
     fullscreen: () => toggleFullscreen(element),
-    'download-png': () => downloadView(element, viewer, measurement, 'png'),
-    'download-pdf': () => downloadView(element, viewer, measurement, 'pdf')
+    'download-png': () => downloadView(element, viewer, measurement, 'png', views?.unchangedName()),
+    'download-pdf': () => downloadView(element, viewer, measurement, 'pdf', views?.unchangedName())
   };
   element.querySelectorAll('[data-cad-action]').forEach((button) => {
     button.addEventListener('click', (event) => {
@@ -884,6 +925,13 @@ async function initialize(element) {
     showDimensions(element, viewer, i18n);
     showSolidsNotice(element, viewer, i18n);
     status.hidden = true;
+    if (element.dataset.viewsUrl) {
+      views = new SavedViews(element, viewer, i18n);
+      actions['save-view'] = () => views.openForm();
+      actions['delete-view'] = () => views.delete();
+      // The viewer can be used without the saved views
+      await views.load().catch((error) => console.error('CAD preview views:', error));
+    }
     element.cadViewer = viewer;
     element.dispatchEvent(new CustomEvent('cad-preview:ready', { bubbles: true, detail: { viewer } }));
     if (element.dataset.snapshotUrl && !viewer.mostlySolids) {
