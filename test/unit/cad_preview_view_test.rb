@@ -129,10 +129,42 @@ class CadPreviewViewTest < ActiveSupport::TestCase
     old_image = view.image
 
     assert_no_difference 'Attachment.count' do
-      view.update!(:image_data => png.reverse)
+      view.update!(:image_data => png_image(3, 3))
     end
     assert_not Attachment.exists?(old_image.id)
-    assert_equal png.reverse, File.binread(view.reload.image.diskfile)
+    assert_equal png_image(3, 3), File.binread(view.reload.image.diskfile)
+  end
+
+  def test_image_should_be_a_png_image_with_a_maximum_size
+    ['', 'text', png_image(1601, 1), png_image(1, 1601), png_image(0, 1),
+     png_image + ("\x00" * CadPreviewView::MAX_IMAGE_SIZE)].each do |data|
+      assert_not build_view('front', :image => data).valid?, "#{data.inspect.truncate(30)} should be invalid"
+    end
+    assert build_view('front', :image => png_image(1600, 1600)).valid?
+  end
+
+  def test_image_should_be_allowed_by_the_settings_of_redmine
+    with_settings(:attachment_extensions_denied => 'png') do
+      assert_not build_view('front').valid?
+    end
+  end
+
+  def test_new_state_should_need_a_new_image
+    view = create_view('front')
+
+    view.state = STATE.merge('position' => [3, 2, 1])
+    assert_not view.valid?
+    view.image_data = png_image
+    assert view.valid?
+  end
+
+  def test_view_that_cannot_be_saved_should_keep_its_image
+    view = create_view('front')
+    image = view.image
+
+    view.update(:name => 'Front View', :image_data => png_image(3, 3))
+    assert_equal image, view.reload.image
+    assert File.exist?(image.diskfile)
   end
 
   def test_stale
@@ -142,7 +174,7 @@ class CadPreviewViewTest < ActiveSupport::TestCase
     @attachment.update_column(:digest, 'changed')
     assert view.reload.stale?
 
-    view.update!(:state => STATE.merge('position' => [3, 2, 1]))
+    view.update!(:state => STATE.merge('position' => [3, 2, 1]), :image_data => png_image)
     assert_not view.stale?
   end
 
@@ -164,9 +196,9 @@ class CadPreviewViewTest < ActiveSupport::TestCase
     @png ||= File.binread(File.join(FIXTURES_DIR, 'thumbnail.png'))
   end
 
-  def build_view(name, attachment: @attachment, state: STATE, is_default: false)
+  def build_view(name, attachment: @attachment, state: STATE, is_default: false, image: png)
     CadPreviewView.new(:attachment => attachment, :name => name, :state => state, :is_default => is_default,
-                       :user => User.find(2), :image_data => png)
+                       :user => User.find(2), :image_data => image)
   end
 
   def create_view(name, **)

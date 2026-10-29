@@ -59,6 +59,15 @@ module RedmineCadPreview
       RedmineCadPreview::DwgConverter.reset_availability!
     end
 
+    # Returns a PNG image with the given size
+    def png_image(width=2, height=2)
+      chunk = ->(type, data) { [data.bytesize].pack('N') + type + data + [Zlib.crc32(type + data)].pack('N') }
+      pixels = ("\x00#{"\x00" * width * 4}" * height).b
+      RedmineCadPreview::PreviewImage::PNG_SIGNATURE +
+        chunk.call('IHDR', [width, height, 8, 6, 0, 0, 0].pack('NNCCCCC')) +
+        chunk.call('IDAT', Zlib::Deflate.deflate(pixels)) + chunk.call('IEND', '')
+    end
+
     def clear_cad_preview_cache
       FileUtils.rm_rf(RedmineCadPreview::DwgConverter.storage_path)
     end
