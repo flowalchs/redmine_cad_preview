@@ -17,9 +17,11 @@ class CreateCadPreviewViews < ActiveRecord::Migration[7.2]
   end
 
   # Run when the plugin is uninstalled. The images of the views are
-  # attachments, which are deleted with their files.
+  # attachments, which are deleted with their files. The converted DWG files
+  # and the images for the thumbnails are deleted too.
   def down
     Attachment.where(:container_type => 'CadPreviewView').find_each(&:destroy)
     drop_table :cad_preview_views
+    FileUtils.rm_rf(RedmineCadPreview::DwgConverter.storage_path)
   end
 end
