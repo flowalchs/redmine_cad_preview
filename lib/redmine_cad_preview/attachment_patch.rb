@@ -4,6 +4,7 @@ module RedmineCadPreview
   module AttachmentPatch
     def self.included(base)
       base.prepend(Thumbnail)
+      base.has_many :cad_preview_views, :dependent => :destroy
       base.after_commit :prepare_cad_preview_later, :on => :create
       base.after_commit :delete_cad_preview, :on => :destroy
     end
