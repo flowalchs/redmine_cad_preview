@@ -47,3 +47,4 @@ es:
   text_cad_preview_view_error: "No se pudo guardar o eliminar la vista."
   text_cad_preview_view_name_format: "Nombre: letras minúsculas, dígitos, - y _ (máximo 64 caracteres)"
   text_cad_preview_view_confirm_delete: "¿Eliminar la vista \"%{name}\"?"
+  text_cad_preview_view_not_found: "La vista \"%{name}\" no existe."

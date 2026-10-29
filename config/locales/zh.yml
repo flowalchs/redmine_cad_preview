@@ -47,3 +47,4 @@ zh:
   text_cad_preview_view_error: "无法保存或删除视图。"
   text_cad_preview_view_name_format: "名称:小写字母、数字、- 和 _(最多 64 个字符)"
   text_cad_preview_view_confirm_delete: "删除视图“%{name}”?"
+  text_cad_preview_view_not_found: "视图“%{name}”不存在。"

@@ -47,3 +47,4 @@ pt-BR:
   text_cad_preview_view_error: "Não foi possível salvar ou excluir a vista."
   text_cad_preview_view_name_format: "Nome: letras minúsculas, dígitos, - e _ (no máximo 64 caracteres)"
   text_cad_preview_view_confirm_delete: "Excluir a vista \"%{name}\"?"
+  text_cad_preview_view_not_found: "A vista \"%{name}\" não existe."

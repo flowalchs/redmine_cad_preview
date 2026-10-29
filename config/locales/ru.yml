@@ -47,3 +47,4 @@ ru:
   text_cad_preview_view_error: "Не удалось сохранить или удалить вид."
   text_cad_preview_view_name_format: "Имя: строчные буквы, цифры, - и _ (не более 64 символов)"
   text_cad_preview_view_confirm_delete: "Удалить вид «%{name}»?"
+  text_cad_preview_view_not_found: "Вид «%{name}» не существует."
