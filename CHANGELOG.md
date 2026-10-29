@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.1 (unreleased)
+## v1.2.0 (unreleased)
 * feat: saved views of CAD attachments: save the current view under a name and restore it from the toolbar, for 3D models and 2D drawings (#3)
 * feat: the default view is restored when the preview is opened, and its image is the thumbnail of the attachment (#3)
 * feat: each view is saved with an image without background, cropped to the model or drawing, which can be downloaded with the attachments API of Redmine (#3)
@@ -8,9 +8,13 @@
 * feat: views in Ruby (`RedmineCadPreview::Views`) and with the REST API, with a conflict instead of overwriting a view changed in the meantime (#3)
 * feat: macro `{{cad_preview(attachment, view=name, height=520, png)}}` to show the viewer of an attachment in wiki pages, issues and other texts, with a saved view, all views (`view=*`) or the images of the views (#3)
 * feat: the macro shows the images of the views in the PDF export, in emails and in Atom feeds, or the thumbnail of the attachment without default view (#3)
+* feat: the image of the view is shown until the viewer is ready, so that a page with viewers looks complete before the files are loaded (#3)
+* feat: the list of views shows "Changed view" when the view has been changed, and choosing the view again restores it (#3)
 * feat: the downloaded PNG and PDF files get the name of the view if the view has not been changed
 * feat: the buttons of the toolbar are grouped, and the downloads are aligned to the right
 * feat: reverting the migration when the plugin is uninstalled deletes the saved views and the converted DWG files
+* perf: DXF and DWG drawings are parsed in a worker, so that large drawings do not block the page and the other viewers
+* perf: the WebAssembly file of the STEP, IGES and BREP reader is loaded only once, also if the server does not send it as application/wasm
 * chore: the plugin has a database migration
 
 ## v1.1.0 (2026-10-27)
