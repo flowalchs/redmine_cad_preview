@@ -13,7 +13,8 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **In the browser**: The files are displayed by a viewer that runs in the browser (three.js, OpenCASCADE as WebAssembly, dxf-viewer). The libraries are included in the plugin, so no internet access is needed.
 - **Files stay in Redmine**: The browser loads the file from Redmine with the same permissions as a download. No file is sent to a third party.
 - **DWG on the server**: DWG files are converted to DXF on the server with [LibreDWG](https://www.gnu.org/software/libredwg/). The conversion runs in the background right after the upload, so the preview is ready when it is opened.
-- **Thumbnails**: The thumbnails in the attachment lists are made from the image that CAD programs save in the file (Inventor, Solid Edge, SolidWorks, FreeCAD, 3MF, DXF, DWG). For files without image, the browser sends a snapshot of the viewer when the preview is opened for the first time by a user who can edit the attachment.
+- **Thumbnails**: The thumbnails in the attachment lists are made from the image of the default view, if the attachment has one. Otherwise they are made from the image that CAD programs save in the file (Inventor, Solid Edge, SolidWorks, FreeCAD, 3MF, DXF, DWG). For files without image, the browser sends a snapshot of the viewer when the preview is opened for the first time by a user who can edit the attachment.
+- **Saved views**: The views are stored in the database, their images as attachments of the views in the `files` directory of Redmine.
 
 ## 🌟 Features
 
@@ -23,14 +24,15 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
 - **File icons** – 3D models and 2D drawings get their own icons in the attachment lists, from Redmine 7.0 (which shows file type icons there). Redmine 7.0 only passes the content type, so only files with a CAD content type get the icons there, e.g. DWG, DXF, STL and IGES. Redmine trunk also passes the filename, so all CAD files get the icons. Icons of the theme are used first.
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
+- **Saved views** – Save the current view (camera, material, lighting, wireframe) under a name, e.g. `front` or `detail`, and restore it from the toolbar. The default view of an attachment is restored when the preview is opened, and its image is the thumbnail of the attachment. Each view is saved with an image without background, cropped to the model or drawing. For 3D models and 2D drawings, in issues, documents, files, wiki pages and news.
 - **Material and lighting** – 3D models can be shown with their original or with matte materials, and with the original lighting or studio lighting. The studio lighting adds reflections, so that metallic models (e.g. glTF) are not displayed dark. The file is not changed.
 - **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
-- **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library.
+- **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library. The file name contains the name of the saved view if the view has not been changed.
 - **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
 - **Settings** – Previewed formats, maximum file size, default material and lighting, DWG converter command and timeout
-- **API for other plugins** – Other plugins can set the material and lighting of an attachment, and save and restore the view of the viewer (see [API for other plugins](#-api-for-other-plugins))
-- **No migration and no additional gems**
+- **API for other plugins** – Other plugins can set the material and lighting of an attachment, read and save the views of attachments in Ruby or with the REST API, and save and restore the view of the viewer in JavaScript (see [API for other plugins](#-api-for-other-plugins))
+- **No additional gems**
 
 ## 📸 Screenshots
 
@@ -52,6 +54,15 @@ Configure the plugin under **Administration → Plugins → Redmine CAD Preview 
 | Conversion timeout            | Maximum time of a DWG conversion in seconds (default: 30)                   |
 
 The settings page shows whether the DWG converter is available. Without it, DWG files are not previewed, and all other formats still work.
+
+## 🔐 Permissions
+
+The views of an attachment can be seen and restored by all users who can see the attachment. Saving, changing and deleting views needs one of these permissions of the roles (**Administration → Roles and permissions**, section "Project"):
+
+| Permission | Description |
+| --- | --- |
+| Save views of own CAD attachments | Views of the attachments the user has added |
+| Save views of all CAD attachments | Views of all attachments the user can see |
 
 ## 📐 DWG conversion with LibreDWG
 
@@ -84,6 +95,7 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 - **Measuring**: Points are picked on the surface of the model or anywhere in the drawing, without snapping to edges or end points. STL, OBJ and 3MF files have no unit, so measurements are shown in "units".
 - **Autodesk Inventor, Solid Edge and SolidWorks**: Only the preview image saved in the file is shown, the model itself cannot be read without these programs. Export the model as STEP to view it in 3D. The image is the view of the last save.
 - **.asm files** are only treated as Solid Edge assemblies if they are OLE compound files, so that assembler source files are not affected.
+- **Saved views** belong to the attachment, so the same file attached twice has its own views each time. When an issue or a project is copied, the attachments are copied without their views.
 
 ## 📋 Requirements
 
@@ -99,7 +111,12 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 cd $REDMINE_ROOT/plugins
 git clone https://github.com/flowalchs/redmine_cad_preview.git
 ```
-Restart your Redmine server to load the plugin. No database migration and no `bundle install` are needed, as the plugin has no Gemfile.
+Run the database migration of the plugin and restart your Redmine server. No `bundle install` is needed, as the plugin has no Gemfile.
+
+```bash
+cd $REDMINE_ROOT
+bundle exec rake redmine:plugins:migrate NAME=redmine_cad_preview RAILS_ENV=production
+```
 
 ## 🔌 API for other plugins
 
@@ -114,6 +131,31 @@ end
 ```
 
 `material_mode` can be `original` or `matte`, `lighting` can be `original` or `studio`. Other keys and values are ignored. Register the provider in `after_plugins_loaded`, as this plugin can be loaded after yours.
+
+### Saved views in Ruby
+
+```ruby
+view = RedmineCadPreview::Views.find(attachment, 'front')  # or Views.default(attachment), Views.all(attachment)
+view.state           # the state of the viewer (Hash, see exportView below)
+view.image.diskfile  # the PNG image of the view
+view.revision        # increased each time the view is saved
+view.stale?          # true if the attachment has changed since the view was saved
+```
+
+`Views.save(attachment, name, user:, revision:, state:, image:, is_default:)` saves a view and `Views.delete(attachment, name, revision:)` deletes it. The revision that was read is needed to change a view, otherwise `RedmineCadPreview::Views::Conflict` is raised. The permissions are not checked by these methods; `CadPreviewView.editable?(attachment, user)` tells whether a user can save views.
+
+### Saved views with the REST API
+
+With the REST API enabled (**Administration → Settings → API**) and an API key, like the API of Redmine:
+
+| Request | Description |
+| --- | --- |
+| `GET /cad_previews/:id/views.json` | Views of the attachment with name, default, revision, stale, state, image (id and `content_url`) and user |
+| `GET /cad_previews/:id/views/:name.json` | One view |
+| `PUT /cad_previews/:id/views/:name.json` | Saves a view: `{"view": {"state": {...}, "image": "<PNG, Base64 encoded>", "is_default": true, "revision": 3}}`. A new view needs the state and the image, an existing view the revision that was read. |
+| `DELETE /cad_previews/:id/views/:name.json?revision=3` | Deletes a view |
+
+A view that was changed or deleted in the meantime returns `409 Conflict`. The image is at most 1600 × 1600 pixels and is downloaded with the attachments API of Redmine (`content_url`). The viewer uses the same URLs without `.json` with the session of the user, so it does not need the REST API.
 
 ### JavaScript
 
@@ -183,7 +225,14 @@ To update a library by hand, change the version in `package.json`, then run `npm
 
 ## ❌ Uninstall
 
-Remove the directory `plugins/redmine_cad_preview` and restart your Redmine server. The converted DWG files in `files/derived_cache/cad_previews` can be deleted.
+Revert the database migration of the plugin, which deletes the saved views with their images and the converted DWG files and images in `files/derived_cache/cad_previews`:
+
+```bash
+cd $REDMINE_ROOT
+bundle exec rake redmine:plugins:migrate NAME=redmine_cad_preview VERSION=0 RAILS_ENV=production
+```
+
+Then remove the directory `plugins/redmine_cad_preview` and restart your Redmine server.
 
 ## 📜 License
 
