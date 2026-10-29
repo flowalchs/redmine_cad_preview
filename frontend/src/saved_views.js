@@ -4,7 +4,8 @@
 //
 // The element [data-cad-preview] has the data attributes:
 //   data-views-url       URL of the views (with the session of the user)
-//   data-views-editable  "true" if the user can save and delete views
+//   data-view            name of the view restored after loading, instead of
+//                        the default view
 
 // Maximum width and height of the image of a view
 export const MAX_IMAGE_SIZE = 1600;
@@ -107,10 +108,14 @@ export class SavedViews {
 
     this.views = (await this.request('GET', this.url)).views;
     this.updateList();
-    const view = this.views.find((v) => v.is_default);
+    const name = this.element.dataset.view;
+    const view = name ? this.views.find((v) => v.name === name.toLowerCase()) : this.views.find((v) => v.is_default);
     if (view) {
       this.select.value = view.name;
       this.restore(view);
+    } else if (name) {
+      // A view that was asked for is not replaced by another view
+      this.showStatus(this.i18n.view_not_found.replace('%{name}', name), 'error');
     }
     this.updateButtons();
   }

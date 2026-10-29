@@ -48,3 +48,6 @@ de:
   text_cad_preview_view_name_format: "Name: Kleinbuchstaben, Ziffern, - und _ (höchstens 64 Zeichen)"
   text_cad_preview_view_confirm_delete: "Die Ansicht \"%{name}\" löschen?"
   text_cad_preview_view_not_found: "Die Ansicht \"%{name}\" existiert nicht."
+  text_cad_preview_no_views: "Der Anhang hat keine gespeicherten Ansichten."
+  text_cad_preview_macro_height: "Die Höhe muss zwischen %{min} und %{max} Pixeln liegen."
+  text_cad_preview_macro_usage: "Verwendung: {{cad_preview(Dateiname oder Anhang-ID, view=Name, height=520, png)}}"

@@ -16,6 +16,10 @@
 //   data-image-url    URL of the image saved in the file (DXF, DWG), shown for
 //                     drawings of 3D solids
 //   data-views-url    URL of the saved views (see saved_views.js)
+//   data-view         Name of the view restored after loading, instead of
+//                     the default view
+//   data-embedded     "true" for viewers in wiki pages and issues (macro),
+//                     which are loaded when they become visible
 
 import * as THREE from 'three';
 import { ModelAppearance, StudioLighting } from './model_appearance.js';
@@ -828,10 +832,12 @@ function storeMaximized(maximized) {
   }
 }
 
+// The maximized state of the attachment page is remembered, not of the
+// viewers in wiki pages and issues
 function setMaximized(element, maximized) {
   element.classList.toggle('cad-preview-maximized', maximized);
   document.body.classList.toggle('cad-preview-maximized-body', maximized);
-  storeMaximized(maximized);
+  if (!element.dataset.embedded) storeMaximized(maximized);
 }
 
 function toggleFullscreen(element) {
@@ -885,7 +891,7 @@ async function initialize(element) {
   const measurement = new Measurement(viewer, element, i18n);
   let views = null;
 
-  if (readMaximized()) setMaximized(element, true);
+  if (!element.dataset.embedded && readMaximized()) setMaximized(element, true);
   markLineStarts(element.querySelector('.cad-preview-toolbar'));
 
   const actions = {
@@ -946,4 +952,26 @@ async function initialize(element) {
   }
 }
 
-document.querySelectorAll('[data-cad-preview]').forEach(initialize);
+// Viewers in wiki pages and issues are loaded when they become visible, so
+// that a page with many viewers does not load all files at once
+const visibility = new IntersectionObserver((entries) => {
+  entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
+    visibility.unobserve(entry.target);
+    initialize(entry.target);
+  });
+}, { rootMargin: '200px' });
+
+function start(element) {
+  if (element.dataset.cadStarted) return;
+  element.dataset.cadStarted = 'true';
+  if (element.dataset.embedded) {
+    visibility.observe(element);
+  } else {
+    initialize(element);
+  }
+}
+
+document.querySelectorAll('[data-cad-preview]').forEach(start);
+// Viewers added later, e.g. in the preview of the text editor
+new MutationObserver(() => document.querySelectorAll('[data-cad-preview]:not([data-cad-started])').forEach(start))
+  .observe(document.body, { childList: true, subtree: true });

@@ -48,3 +48,6 @@ ru:
   text_cad_preview_view_name_format: "Имя: строчные буквы, цифры, - и _ (не более 64 символов)"
   text_cad_preview_view_confirm_delete: "Удалить вид «%{name}»?"
   text_cad_preview_view_not_found: "Вид «%{name}» не существует."
+  text_cad_preview_no_views: "У вложения нет сохранённых видов."
+  text_cad_preview_macro_height: "Высота должна быть от %{min} до %{max} пикселей."
+  text_cad_preview_macro_usage: "Использование: {{cad_preview(имя файла или ID вложения, view=имя, height=520, png)}}"

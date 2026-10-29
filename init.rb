@@ -28,3 +28,5 @@ end
 unless IconsHelper.include?(RedmineCadPreview::IconsHelperPatch)
   IconsHelper.prepend(RedmineCadPreview::IconsHelperPatch)
 end
+
+RedmineCadPreview::Macro.register

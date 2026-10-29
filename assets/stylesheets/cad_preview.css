@@ -54,7 +54,8 @@
 
 .cad-preview-canvas {
   position: relative;
-  block-size: 70vh;
+  /* The macro sets the height */
+  block-size: var(--cad-preview-height, 70vh);
   min-block-size: 400px;
   border: 1px solid #dee2e6;
   border-radius: 3px;
@@ -208,4 +209,30 @@ body.cad-preview-maximized-body {
 
 .cad-preview-view-error {
   color: #c92a2a;
+}
+
+/* Viewers and images of the macro in wiki pages and issues */
+.cad-preview-embedded {
+  margin-block: 8px;
+}
+
+.cad-preview-embedded .cad-preview-canvas {
+  min-block-size: 0;
+}
+
+.cad-preview-embedded .cad-preview-toolbar,
+.cad-preview-embedded .cad-preview-toolbar-group {
+  gap: 4px 8px;
+}
+
+.cad-preview-figure {
+  display: inline-block;
+  margin: 8px 16px 8px 0;
+  vertical-align: top;
+}
+
+.cad-preview-figure img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
 }

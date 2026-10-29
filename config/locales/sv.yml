@@ -48,3 +48,6 @@ sv:
   text_cad_preview_view_name_format: "Namn: små bokstäver, siffror, - och _ (högst 64 tecken)"
   text_cad_preview_view_confirm_delete: "Ta bort vyn \"%{name}\"?"
   text_cad_preview_view_not_found: "Vyn \"%{name}\" finns inte."
+  text_cad_preview_no_views: "Bilagan har inga sparade vyer."
+  text_cad_preview_macro_height: "Höjden måste vara mellan %{min} och %{max} pixlar."
+  text_cad_preview_macro_usage: "Användning: {{cad_preview(filnamn eller bilage-ID, view=namn, height=520, png)}}"
