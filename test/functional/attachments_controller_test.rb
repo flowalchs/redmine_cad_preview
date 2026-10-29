@@ -213,6 +213,17 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'div.cad-preview:not([data-snapshot-url])'
   end
 
+  def test_show_should_show_the_image_of_the_default_view_until_the_viewer_is_ready
+    attachment = create_cad_attachment('drawing.dxf')
+    view = RedmineCadPreview::Views.save(attachment, 'front', :user => User.find(2),
+                                                              :state => {'version' => 1, 'projection' => 'drawing'},
+                                                              :image => png_image)
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select '.cad-preview-canvas img.cad-preview-placeholder.cad-preview-placeholder-drawing[src=?]',
+                  "/attachments/download/#{view.image.id}/front.png"
+  end
+
   def test_show_should_not_request_snapshot_from_user_who_cannot_edit
     attachment = create_cad_attachment('model.step')
     @request.session[:user_id] = nil

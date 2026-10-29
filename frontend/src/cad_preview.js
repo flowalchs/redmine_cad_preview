@@ -921,6 +921,8 @@ async function initialize(element) {
       // The viewer can be used without the saved views
       await views.load().catch((error) => console.error('CAD preview views:', error));
     }
+    // The image of the view is replaced by the viewer
+    element.querySelector('.cad-preview-placeholder')?.remove();
     element.cadViewer = viewer;
     element.dispatchEvent(new CustomEvent('cad-preview:ready', { bubbles: true, detail: { viewer } }));
     if (element.dataset.snapshotUrl && !viewer.mostlySolids) {

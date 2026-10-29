@@ -53,6 +53,22 @@ class CadPreviewMacroTest < Redmine::IntegrationTest
     assert_equal %w[detail front], css_select('.wiki div.cad-preview').pluck('data-view')
   end
 
+  def test_macro_should_show_the_image_of_the_view_until_the_viewer_is_ready
+    front = save_view('front')
+    detail = save_view('detail')
+    show_issue_with('{{cad_preview(model.step)}} {{cad_preview(model.step, view=detail)}}')
+
+    assert_equal ["/attachments/download/#{front.image.id}/front.png", "/attachments/download/#{detail.image.id}/detail.png"],
+                 css_select('.wiki .cad-preview-canvas img.cad-preview-placeholder').pluck('src')
+  end
+
+  def test_macro_without_views_should_not_show_an_image_until_the_viewer_is_ready
+    show_issue_with('{{cad_preview(model.step)}}')
+
+    assert_select '.wiki div.cad-preview'
+    assert_select '.wiki img.cad-preview-placeholder', 0
+  end
+
   def test_macro_with_png
     view = save_view('front')
     show_issue_with('{{cad_preview(model.step, view=front, png, height=300)}}')

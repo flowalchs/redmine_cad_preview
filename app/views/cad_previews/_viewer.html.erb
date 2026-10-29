@@ -23,6 +23,8 @@
   <% url = cad_format == 'dwg' ? cad_preview_dxf_path(attachment) : cad_preview_file_path(attachment) %>
   <% viewer_options = RedmineCadPreview::ViewerOptions.for(attachment) %>
   <% views_editable = CadPreviewView.editable?(attachment) %>
+  <%# The image of the view that is restored, shown until the viewer is ready %>
+  <% placeholder = (view ? RedmineCadPreview::Views.find(attachment, view) : RedmineCadPreview::Views.default(attachment))&.image %>
   <%# In the macro, the buttons show only their icon, with the label as title %>
   <% button = lambda do |icon_name, label, action, css_class: nil, plugin: 'redmine_cad_preview', **options|
        link_to sprite_icon(icon_name, label, :plugin => plugin, :icon_only => embedded), '#',
@@ -130,6 +132,10 @@
       <span class="cad-preview-view-status" role="status"></span>
     </div>
     <div class="cad-preview-canvas"<% if height %> style="--cad-preview-height: <%= height.to_i %>px"<% end %>>
+      <% if placeholder %>
+        <%= image_tag download_named_attachment_path(placeholder, placeholder.filename), :alt => '',
+                      :class => "cad-preview-placeholder#{' cad-preview-placeholder-drawing' if format == 'dxf'}" %>
+      <% end %>
       <div class="cad-preview-status"><%= l(:label_loading) %></div>
     </div>
   </div>
