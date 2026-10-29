@@ -36,3 +36,5 @@ zh:
   label_cad_preview_viewer_defaults: "3D 查看器默认值"
   permission_save_own_cad_preview_views: "保存自己的 CAD 附件的视图"
   permission_save_cad_preview_views: "保存所有 CAD 附件的视图"
+  error_cad_preview_view_image: "图像必须是 Base64 编码的 PNG 图像。"
+  error_cad_preview_view_conflict: "该视图在此期间已被更改或删除。请重新加载后再试。"

@@ -36,3 +36,5 @@ de:
   label_cad_preview_viewer_defaults: "Standardwerte des 3D-Viewers"
   permission_save_own_cad_preview_views: "Ansichten eigener CAD-Anhänge speichern"
   permission_save_cad_preview_views: "Ansichten aller CAD-Anhänge speichern"
+  error_cad_preview_view_image: "Das Bild muss ein Base64-kodiertes PNG-Bild sein."
+  error_cad_preview_view_conflict: "Die Ansicht wurde inzwischen geändert oder gelöscht. Bitte neu laden und erneut versuchen."

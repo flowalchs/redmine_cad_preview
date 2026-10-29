@@ -36,3 +36,5 @@ pl:
   label_cad_preview_viewer_defaults: "Ustawienia domyślne podglądu 3D"
   permission_save_own_cad_preview_views: "Zapisywanie widoków własnych załączników CAD"
   permission_save_cad_preview_views: "Zapisywanie widoków wszystkich załączników CAD"
+  error_cad_preview_view_image: "Obraz musi być obrazem PNG zakodowanym w Base64."
+  error_cad_preview_view_conflict: "Widok został w międzyczasie zmieniony lub usunięty. Wczytaj go ponownie i spróbuj jeszcze raz."

@@ -36,3 +36,5 @@ en:
   label_cad_preview_viewer_defaults: "Defaults of the 3D viewer"
   permission_save_own_cad_preview_views: "Save views of own CAD attachments"
   permission_save_cad_preview_views: "Save views of all CAD attachments"
+  error_cad_preview_view_image: "The image must be a Base64 encoded PNG image."
+  error_cad_preview_view_conflict: "The view has been changed or deleted in the meantime. Reload it and try again."

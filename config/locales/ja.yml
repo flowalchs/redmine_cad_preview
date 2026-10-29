@@ -36,3 +36,5 @@ ja:
   label_cad_preview_viewer_defaults: "3Dビューアーの既定値"
   permission_save_own_cad_preview_views: "自分のCAD添付ファイルのビューを保存"
   permission_save_cad_preview_views: "すべてのCAD添付ファイルのビューを保存"
+  error_cad_preview_view_image: "画像はBase64でエンコードされたPNG画像である必要があります。"
+  error_cad_preview_view_conflict: "ビューはその間に変更または削除されました。再読み込みしてもう一度お試しください。"

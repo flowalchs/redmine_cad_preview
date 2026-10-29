@@ -36,3 +36,5 @@ pt-BR:
   label_cad_preview_viewer_defaults: "Padrões do visualizador 3D"
   permission_save_own_cad_preview_views: "Salvar vistas dos próprios anexos CAD"
   permission_save_cad_preview_views: "Salvar vistas de todos os anexos CAD"
+  error_cad_preview_view_image: "A imagem deve ser uma imagem PNG codificada em Base64."
+  error_cad_preview_view_conflict: "A vista foi alterada ou excluída nesse meio tempo. Recarregue-a e tente novamente."

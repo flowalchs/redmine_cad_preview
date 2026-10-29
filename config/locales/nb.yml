@@ -36,3 +36,5 @@ nb:
   label_cad_preview_viewer_defaults: "Standardverdier for 3D-visningen"
   permission_save_own_cad_preview_views: "Lagre visninger av egne CAD-vedlegg"
   permission_save_cad_preview_views: "Lagre visninger av alle CAD-vedlegg"
+  error_cad_preview_view_image: "Bildet må være et Base64-kodet PNG-bilde."
+  error_cad_preview_view_conflict: "Visningen er endret eller slettet i mellomtiden. Last den inn på nytt og prøv igjen."

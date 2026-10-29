@@ -36,3 +36,5 @@ fr:
   label_cad_preview_viewer_defaults: "Valeurs par défaut de la visionneuse 3D"
   permission_save_own_cad_preview_views: "Enregistrer les vues de ses propres fichiers CAO"
   permission_save_cad_preview_views: "Enregistrer les vues de tous les fichiers CAO"
+  error_cad_preview_view_image: "L'image doit être une image PNG encodée en Base64."
+  error_cad_preview_view_conflict: "La vue a été modifiée ou supprimée entre-temps. Rechargez-la et réessayez."

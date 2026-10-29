@@ -36,3 +36,5 @@ ru:
   label_cad_preview_viewer_defaults: "Настройки 3D-просмотра по умолчанию"
   permission_save_own_cad_preview_views: "Сохранение видов своих CAD-вложений"
   permission_save_cad_preview_views: "Сохранение видов всех CAD-вложений"
+  error_cad_preview_view_image: "Изображение должно быть PNG-изображением в кодировке Base64."
+  error_cad_preview_view_conflict: "Вид был изменён или удалён за это время. Перезагрузите его и повторите попытку."

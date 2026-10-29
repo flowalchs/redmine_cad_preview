@@ -36,3 +36,5 @@ ko:
   label_cad_preview_viewer_defaults: "3D 뷰어 기본값"
   permission_save_own_cad_preview_views: "자신의 CAD 첨부 파일 뷰 저장"
   permission_save_cad_preview_views: "모든 CAD 첨부 파일 뷰 저장"
+  error_cad_preview_view_image: "이미지는 Base64로 인코딩된 PNG 이미지여야 합니다."
+  error_cad_preview_view_conflict: "그 사이에 뷰가 변경되었거나 삭제되었습니다. 다시 불러온 후 다시 시도하세요."
