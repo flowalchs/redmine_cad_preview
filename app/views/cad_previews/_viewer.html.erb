@@ -117,7 +117,7 @@
     <% if views_editable %>
       <form class="cad-preview-view-form" hidden>
         <label><%= l(:field_name) %>
-          <%= text_field_tag 'name', '', :id => nil, :required => true, :maxlength => 64, :size => 20,
+          <%= text_field_tag 'name', '', :id => nil, :required => true, :maxlength => 64, :size => 20, :autocomplete => 'off',
                              :pattern => '[A-Za-z0-9][A-Za-z0-9_\-]{0,63}' %>
         </label>
         <label><%= check_box_tag 'is_default', '1', false, :id => nil %> <%= l(:label_default) %></label>
