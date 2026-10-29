@@ -1,0 +1,14 @@
+<%# Suggestions for the macro when {{cad_preview( is typed in a text field: the
+    attachments of the issue, wiki page, document, news or message of the page,
+    with the names of their views %>
+<% if User.current.logged? %>
+  <% object = [@issue, @page, @document, @news, @message].find {|o| o.respond_to?(:attachments)} %>
+  <% attachments = object ? object.attachments.select {|a| RedmineCadPreview.previewable?(a)} : [] %>
+  <% files = attachments.map {|a| {:id => a.id, :name => a.filename, :views => a.cad_preview_views.sorted.pluck(:name)}} %>
+  <% extensions = RedmineCadPreview::FORMATS.slice(*RedmineCadPreview.enabled_formats).values.flatten %>
+  <%= tag.div :hidden => true,
+              :data => {:controller => 'cad-preview-autocomplete',
+                        :cad_preview_autocomplete_files_value => files.to_json,
+                        :cad_preview_autocomplete_extensions_value => extensions.to_json} %>
+  <%= javascript_include_tag 'cad_preview_autocomplete', :plugin => 'redmine_cad_preview', :type => 'module' %>
+<% end %>

@@ -8,6 +8,7 @@
 * feat: views in Ruby (`RedmineCadPreview::Views`) and with the REST API, with a conflict instead of overwriting a view changed in the meantime (#3)
 * feat: macro `{{cad_preview(attachment, view=name, height=520, png)}}` to show the viewer of an attachment in wiki pages, issues and other texts, with a saved view, all views (`view=*`) or the images of the views (#3)
 * feat: the macro shows the images of the views in the PDF export, in emails and in Atom feeds, or the thumbnail of the attachment without default view (#3)
+* feat: suggestions for the macro in text fields: the CAD attachments of the issue, wiki page or document, then the options, the saved views of the file and heights; Enter closes the macro, Tab adds the next argument (Redmine 6.1 and later) (#3)
 * feat: the image of the view is shown until the viewer is ready, so that a page with viewers looks complete before the files are loaded (#3)
 * feat: the list of views shows "Changed view" when the view has been changed, and choosing the view again restores it (#3)
 * feat: the downloaded PNG and PDF files get the name of the view if the view has not been changed

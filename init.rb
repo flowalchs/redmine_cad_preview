@@ -34,3 +34,6 @@ unless Redmine::Export::PDF::ITCPDF.include?(RedmineCadPreview::PdfPatch)
 end
 
 RedmineCadPreview::Macro.register
+
+# Suggestions of CAD files for the macro in text fields
+require_relative 'lib/redmine_cad_preview/hooks'

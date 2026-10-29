@@ -24,6 +24,18 @@ await esbuild.build({
   outfile: `${assets}javascripts/cad_preview.js`
 });
 
+// Suggestions of file names in text fields, on all pages. Stimulus is
+// provided by Redmine.
+await esbuild.build({
+  entryPoints: ['src/autocomplete.js'],
+  bundle: true,
+  format: 'esm',
+  target: 'es2020',
+  minify: true,
+  external: ['@hotwired/stimulus'],
+  outfile: `${assets}javascripts/cad_preview_autocomplete.js`
+});
+
 // Worker that parses DXF files
 await esbuild.build({
   entryPoints: ['src/dxf_worker.js'],

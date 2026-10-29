@@ -77,6 +77,8 @@ The macro `cad_preview` shows the viewer of a CAD attachment in wiki pages, issu
 
 The viewer in the macro has the same toolbar as the preview of the attachment, with icons only. The views can be restored and, with the permissions, saved and deleted. The viewers are loaded when they become visible, so that a page with many viewers does not load all files at once.
 
+When `{{cad_preview(` is typed in a text field, the CAD attachments of the issue, wiki page, document, news or message are suggested, together with the CAD files uploaded in the form. Enter closes the macro, Tab adds the next argument: the options `view=`, `height=` and `png` are suggested, then the saved views of the file and some heights (Redmine 6.1 and later, which provide Stimulus).
+
 In the PDF export of issues and wiki pages, in emails and in Atom feeds, the macro shows the images of the views, as no viewer can be shown there. Without default view, it shows the thumbnail of the attachment (the image saved in the file or the snapshot of the viewer). The attachment must be visible to the user, otherwise the macro shows an error.
 
 ## 🔐 Permissions
@@ -235,6 +237,7 @@ The versions are pinned in `frontend/package.json` (exact versions) and `fronten
 | --- | --- | --- |
 | `three` | 3D viewer, loaders for STL, OBJ, 3MF and glTF, studio lighting | `assets/javascripts/cad_preview.js` |
 | `occt-import-js` | Reading STEP, IGES and BREP (WebAssembly) | `assets/javascripts/occt-import-js.{js,wasm}` |
+| `@hotwired/stimulus` | Suggestions of file names for the macro, provided by Redmine (not included) | `assets/javascripts/cad_preview_autocomplete.js` |
 | `dxf-viewer` | DXF viewer (with `opentype.js`, `earcut`, `loglevel`) | `assets/javascripts/cad_preview.js`, `assets/javascripts/cad_preview_dxf_worker.js` (parsing in a worker) |
 | `@fontsource/noto-sans` | Font for texts in DXF drawings | `assets/fonts/` |
 | `@tabler/icons` | Toolbar and file icons | `assets/images/icons.svg` |
