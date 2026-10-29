@@ -29,4 +29,8 @@ unless IconsHelper.include?(RedmineCadPreview::IconsHelperPatch)
   IconsHelper.prepend(RedmineCadPreview::IconsHelperPatch)
 end
 
+unless Redmine::Export::PDF::ITCPDF.include?(RedmineCadPreview::PdfPatch)
+  Redmine::Export::PDF::ITCPDF.prepend(RedmineCadPreview::PdfPatch)
+end
+
 RedmineCadPreview::Macro.register
