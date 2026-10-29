@@ -34,3 +34,5 @@ pt-BR:
   label_cad_preview_matte: "Fosco"
   label_cad_preview_studio: "Estúdio"
   label_cad_preview_viewer_defaults: "Padrões do visualizador 3D"
+  permission_save_own_cad_preview_views: "Salvar vistas dos próprios anexos CAD"
+  permission_save_cad_preview_views: "Salvar vistas de todos os anexos CAD"

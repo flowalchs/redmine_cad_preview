@@ -34,3 +34,5 @@ nb:
   label_cad_preview_matte: "Matt"
   label_cad_preview_studio: "Studio"
   label_cad_preview_viewer_defaults: "Standardverdier for 3D-visningen"
+  permission_save_own_cad_preview_views: "Lagre visninger av egne CAD-vedlegg"
+  permission_save_cad_preview_views: "Lagre visninger av alle CAD-vedlegg"

@@ -58,6 +58,34 @@ class CadPreviewViewTest < ActiveSupport::TestCase
     assert other.reload.is_default?
   end
 
+  def test_editable_with_permission_for_all_attachments
+    Role.find(2).add_permission!(:save_cad_preview_views)
+
+    assert CadPreviewView.editable?(@attachment, User.find(3))
+  end
+
+  def test_editable_with_permission_for_own_attachments
+    Role.find(2).add_permission!(:save_own_cad_preview_views)
+
+    assert_not CadPreviewView.editable?(@attachment, User.find(3))
+    @attachment.update_column(:author_id, 3)
+    assert CadPreviewView.editable?(@attachment.reload, User.find(3))
+  end
+
+  def test_not_editable_without_permission
+    @attachment.update_column(:author_id, 3)
+
+    assert_not CadPreviewView.editable?(@attachment.reload, User.find(3))
+    assert_not CadPreviewView.editable?(@attachment, User.anonymous)
+  end
+
+  def test_not_editable_if_the_attachment_is_not_visible
+    Role.find(2).add_permission!(:save_cad_preview_views)
+    Role.find(2).remove_permission!(:view_issues)
+
+    assert_not CadPreviewView.editable?(@attachment, User.find(3))
+  end
+
   def test_name_should_be_valid
     ['', 'front view', '-front', 'a' * 65, 'ä'].each do |name|
       assert_not build_view(name).valid?, "#{name.inspect} should be invalid"

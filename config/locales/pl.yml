@@ -34,3 +34,5 @@ pl:
   label_cad_preview_matte: "Matowy"
   label_cad_preview_studio: "Studio"
   label_cad_preview_viewer_defaults: "Ustawienia domyślne podglądu 3D"
+  permission_save_own_cad_preview_views: "Zapisywanie widoków własnych załączników CAD"
+  permission_save_cad_preview_views: "Zapisywanie widoków wszystkich załączników CAD"

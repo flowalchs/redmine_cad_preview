@@ -34,3 +34,5 @@ it:
   label_cad_preview_matte: "Opaco"
   label_cad_preview_studio: "Studio"
   label_cad_preview_viewer_defaults: "Valori predefiniti del visualizzatore 3D"
+  permission_save_own_cad_preview_views: "Salvare le viste dei propri allegati CAD"
+  permission_save_cad_preview_views: "Salvare le viste di tutti gli allegati CAD"

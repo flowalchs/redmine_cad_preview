@@ -34,3 +34,5 @@ de:
   label_cad_preview_matte: "Matt"
   label_cad_preview_studio: "Studio"
   label_cad_preview_viewer_defaults: "Standardwerte des 3D-Viewers"
+  permission_save_own_cad_preview_views: "Ansichten eigener CAD-Anhänge speichern"
+  permission_save_cad_preview_views: "Ansichten aller CAD-Anhänge speichern"

@@ -33,6 +33,16 @@ class CadPreviewView < ApplicationRecord
     name.to_s.strip.downcase
   end
 
+  # True if the user can save, change and delete the views of the attachment:
+  # the views of all attachments, or of the attachments the user has added
+  def self.editable?(attachment, user=User.current)
+    project = attachment.project
+    return false unless project && attachment.visible?(user)
+
+    user.allowed_to?(:save_cad_preview_views, project) ||
+      (attachment.author == user && user.allowed_to?(:save_own_cad_preview_views, project))
+  end
+
   def name=(value)
     super(self.class.normalize_name(value))
   end

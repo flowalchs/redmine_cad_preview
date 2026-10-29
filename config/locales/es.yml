@@ -34,3 +34,5 @@ es:
   label_cad_preview_matte: "Mate"
   label_cad_preview_studio: "Estudio"
   label_cad_preview_viewer_defaults: "Valores predeterminados del visor 3D"
+  permission_save_own_cad_preview_views: "Guardar vistas de adjuntos CAD propios"
+  permission_save_cad_preview_views: "Guardar vistas de todos los adjuntos CAD"

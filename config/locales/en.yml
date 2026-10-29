@@ -34,3 +34,5 @@ en:
   text_cad_preview_no_image: "The file contains no preview image."
   text_cad_preview_solids: "The drawing contains 3D solids, which cannot be displayed in the preview."
   label_cad_preview_viewer_defaults: "Defaults of the 3D viewer"
+  permission_save_own_cad_preview_views: "Save views of own CAD attachments"
+  permission_save_cad_preview_views: "Save views of all CAD attachments"

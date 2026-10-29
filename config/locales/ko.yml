@@ -34,3 +34,5 @@ ko:
   label_cad_preview_matte: "무광"
   label_cad_preview_studio: "스튜디오"
   label_cad_preview_viewer_defaults: "3D 뷰어 기본값"
+  permission_save_own_cad_preview_views: "자신의 CAD 첨부 파일 뷰 저장"
+  permission_save_cad_preview_views: "모든 CAD 첨부 파일 뷰 저장"

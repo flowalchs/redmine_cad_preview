@@ -34,3 +34,5 @@ sv:
   label_cad_preview_matte: "Matt"
   label_cad_preview_studio: "Studio"
   label_cad_preview_viewer_defaults: "Standardvärden för 3D-visaren"
+  permission_save_own_cad_preview_views: "Spara vyer av egna CAD-bilagor"
+  permission_save_cad_preview_views: "Spara vyer av alla CAD-bilagor"

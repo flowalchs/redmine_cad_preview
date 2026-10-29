@@ -34,3 +34,5 @@ fr:
   label_cad_preview_matte: "Mat"
   label_cad_preview_studio: "Studio"
   label_cad_preview_viewer_defaults: "Valeurs par défaut de la visionneuse 3D"
+  permission_save_own_cad_preview_views: "Enregistrer les vues de ses propres fichiers CAO"
+  permission_save_cad_preview_views: "Enregistrer les vues de tous les fichiers CAO"

@@ -34,3 +34,5 @@ ja:
   label_cad_preview_matte: "マット"
   label_cad_preview_studio: "スタジオ"
   label_cad_preview_viewer_defaults: "3Dビューアーの既定値"
+  permission_save_own_cad_preview_views: "自分のCAD添付ファイルのビューを保存"
+  permission_save_cad_preview_views: "すべてのCAD添付ファイルのビューを保存"

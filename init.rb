@@ -11,6 +11,10 @@ Redmine::Plugin.register :redmine_cad_preview do
 
   settings :default => RedmineCadPreview::DEFAULT_SETTINGS,
            :partial => 'settings/cad_preview'
+
+  # Saving, changing and deleting the views of attachments
+  permission :save_own_cad_preview_views, {}
+  permission :save_cad_preview_views, {}
 end
 
 unless AttachmentsController.include?(RedmineCadPreview::AttachmentsControllerPatch)

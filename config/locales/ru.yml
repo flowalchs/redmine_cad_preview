@@ -34,3 +34,5 @@ ru:
   label_cad_preview_matte: "Матовый"
   label_cad_preview_studio: "Студия"
   label_cad_preview_viewer_defaults: "Настройки 3D-просмотра по умолчанию"
+  permission_save_own_cad_preview_views: "Сохранение видов своих CAD-вложений"
+  permission_save_cad_preview_views: "Сохранение видов всех CAD-вложений"
