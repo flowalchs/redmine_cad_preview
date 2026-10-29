@@ -57,6 +57,7 @@
        <% end %>
        <% if format == 'dxf' %>
        data-fonts="<%= %w[latin latin-ext].map {|s| asset_path("plugin_assets/redmine_cad_preview/noto-sans-#{s}-400-normal.woff")}.to_json %>"
+       data-dxf-worker="<%= asset_path('plugin_assets/redmine_cad_preview/cad_preview_dxf_worker.js') %>"
        <% end %>
        data-i18n="<%= {:distance => l(:label_cad_preview_distance), :angle => l(:label_cad_preview_angle),
                        :dimensions => l(:label_cad_preview_dimensions), :units => l(:label_cad_preview_units),

@@ -8,6 +8,7 @@
 //   data-occt-script  URL of occt-import-js.js (STEP, IGES, BREP and FreeCAD only)
 //   data-occt-wasm    URL of occt-import-js.wasm (STEP, IGES, BREP and FreeCAD only)
 //   data-fonts        JSON array of font URLs (DXF only)
+//   data-dxf-worker   URL of the worker that parses DXF files (DXF only)
 //   data-error        Message shown when the file cannot be displayed
 //   data-i18n         JSON object with the labels of the measurements
 //   data-filename     Name of the file, used for the downloaded images
@@ -38,7 +39,7 @@ import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
 import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
 import { strFromU8, unzipSync } from 'three/addons/libs/fflate.module.js';
 import { DxfViewer } from 'dxf-viewer';
-import DxfParser from 'dxf-viewer/src/parser/DxfParser.js';
+import { SOLID_TYPES } from './dxf_solids.js';
 
 const Z_UP_FORMATS = ['step', 'iges', 'brep', 'freecad', 'stl', '3mf', 'amf', '3ds'];
 const OCCT_FORMATS = { step: 'ReadStepFile', iges: 'ReadIgesFile', brep: 'ReadBrepFile' };
@@ -55,28 +56,6 @@ const MEASUREMENT_COLOR = '#e8590c';
 const PDF_PAGE = { long: 842, short: 595, margin: 28 };
 // Maximum size of the snapshot for the thumbnail (the largest Redmine thumbnail)
 const SNAPSHOT_SIZE = 800;
-
-// 3D solids (ACIS data) cannot be displayed by dxf-viewer, which skips them.
-// They are parsed as empty entities, so that the preview can tell that they
-// are missing.
-const SOLID_TYPES = ['3DSOLID', 'BODY', 'REGION', 'SURFACE'];
-const SOLID_HANDLERS = SOLID_TYPES.map((type) => {
-  function SolidParser() {}
-  SolidParser.ForEntityName = type;
-  SolidParser.prototype.parseEntity = (scanner) => {
-    let group = scanner.next();
-    while (group !== 'EOF' && group.code !== 0) group = scanner.next();
-    return { type };
-  };
-  return SolidParser;
-});
-const registerEntityHandler = DxfParser.prototype.registerEntityHandler;
-DxfParser.prototype.registerEntityHandler = function register(handlerType) {
-  registerEntityHandler.call(this, handlerType);
-  for (const handler of SOLID_HANDLERS) {
-    if (!this._entityHandlers[handler.ForEntityName]) registerEntityHandler.call(this, handler);
-  }
-};
 
 // Textures and other files referenced by a model (e.g. by FBX, Collada or
 // 3DS files) are not loaded, as only the attachment itself is available. A
@@ -97,10 +76,12 @@ function loadScript(src) {
   });
 }
 
+// The WebAssembly file is loaded here, as the browser loads it twice if the
+// server does not send it as application/wasm
 function loadOcct(scriptUrl, wasmUrl) {
   if (!occtPromise) {
-    occtPromise = loadScript(scriptUrl)
-      .then(() => window.occtimportjs({ locateFile: () => wasmUrl }));
+    occtPromise = Promise.all([loadScript(scriptUrl), fetchFile(wasmUrl)])
+      .then(([, wasmBinary]) => window.occtimportjs({ wasmBinary }));
   }
   return occtPromise;
 }
@@ -596,9 +577,11 @@ class DrawingViewer {
   }
 
   async load() {
+    const worker = this.element.dataset.dxfWorker;
     await this.viewer.Load({
       url: this.element.dataset.url,
-      fonts: JSON.parse(this.element.dataset.fonts || '[]')
+      fonts: JSON.parse(this.element.dataset.fonts || '[]'),
+      workerFactory: worker ? () => new Worker(worker) : null
     });
     const dxf = this.viewer.GetDxf();
     this.unit = DXF_UNITS[dxf?.header?.$INSUNITS];

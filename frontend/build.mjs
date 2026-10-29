@@ -24,6 +24,17 @@ await esbuild.build({
   outfile: `${assets}javascripts/cad_preview.js`
 });
 
+// Worker that parses DXF files
+await esbuild.build({
+  entryPoints: ['src/dxf_worker.js'],
+  bundle: true,
+  format: 'iife',
+  target: 'es2020',
+  minify: true,
+  legalComments: 'eof',
+  outfile: `${assets}javascripts/cad_preview_dxf_worker.js`
+});
+
 // occt-import-js (STEP, IGES, BREP) is loaded only when needed
 const occt = 'node_modules/occt-import-js/dist/';
 copyFileSync(`${occt}occt-import-js.js`, `${assets}javascripts/occt-import-js.js`);

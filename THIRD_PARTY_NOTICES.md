@@ -17,8 +17,8 @@ its own license. The license texts are in [licenses/](licenses).
 | [Tabler Icons](https://tabler.io/icons) | 3.49.0 | MIT | Toolbar icons (`assets/images/icons.svg`) | https://github.com/tabler/tabler-icons |
 | [Noto Sans](https://fonts.google.com/noto/specimen/Noto+Sans) | 5.3.0 (Fontsource) | OFL-1.1 | Font for texts in DXF drawings | https://github.com/notofonts/latin-greek-cyrillic |
 
-`assets/javascripts/cad_preview.js` is built from the unmodified packages with
-esbuild (see `frontend/`). `assets/javascripts/occt-import-js.js` and
+`assets/javascripts/cad_preview.js` and `assets/javascripts/cad_preview_dxf_worker.js`
+are built from the unmodified packages with esbuild (see `frontend/`). `assets/javascripts/occt-import-js.js` and
 `assets/javascripts/occt-import-js.wasm` are the unmodified files of the
 occt-import-js package and can be replaced with another build of it.
 
