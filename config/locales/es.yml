@@ -51,3 +51,4 @@ es:
   text_cad_preview_no_views: "El adjunto no tiene vistas guardadas."
   text_cad_preview_macro_height: "La altura debe estar entre %{min} y %{max} píxeles."
   text_cad_preview_macro_usage: "Uso: {{cad_preview(nombre de archivo o ID del adjunto, view=nombre, height=520, png)}}"
+  label_cad_preview_view_changed: "Vista modificada"

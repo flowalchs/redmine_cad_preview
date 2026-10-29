@@ -82,24 +82,38 @@ export class SavedViews {
     this.i18n = i18n;
     this.url = element.dataset.viewsUrl;
     this.views = [];
-    // The view that was restored or saved last
+    // The view that was restored or saved last, with its state
     this.active = null;
+    // True if the view has been changed since then. The list then shows
+    // "Changed view", so that the view can be restored by choosing it again.
+    this.changed = false;
     this.select = element.querySelector('[data-cad-view]');
     this.form = element.querySelector('.cad-preview-view-form');
     this.status = element.querySelector('.cad-preview-view-status');
   }
 
+  // The view that was chosen or saved last, which is saved or deleted
   get selected() {
-    return this.views.find((view) => view.name === this.select.value);
+    return this.views.find((view) => view.name === this.active?.name);
   }
 
   // Loads the views and restores the default view
   async load() {
     this.select.addEventListener('change', () => {
-      const view = this.selected;
+      const view = this.views.find((v) => v.name === this.select.value);
       if (view) this.restore(view);
       this.updateButtons();
     });
+    // Rotating, zooming and the buttons of the toolbar change the view. It is
+    // checked after the movement has stopped.
+    let timer = null;
+    const check = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => this.checkChanged(), 600);
+    };
+    for (const type of ['pointerup', 'wheel', 'keyup', 'change', 'click']) {
+      this.element.addEventListener(type, check, { capture: true, passive: true });
+    }
     this.form?.addEventListener('submit', (event) => {
       event.preventDefault();
       this.save();
@@ -111,7 +125,6 @@ export class SavedViews {
     const name = this.element.dataset.view;
     const view = name ? this.views.find((v) => v.name === name.toLowerCase()) : this.views.find((v) => v.is_default);
     if (view) {
-      this.select.value = view.name;
       this.restore(view);
     } else if (name) {
       // A view that was asked for is not replaced by another view
@@ -126,9 +139,21 @@ export class SavedViews {
     return this.active && sameState(this.viewer.exportView(), this.active.state) ? this.active.name : null;
   }
 
+  // Shows "Changed view" in the list if the view has been changed since it
+  // was restored or saved
+  checkChanged() {
+    if (!this.active) return;
+    const changed = !sameState(this.viewer.exportView(), this.active.state);
+    if (changed === this.changed) return;
+    this.changed = changed;
+    this.updateList();
+  }
+
   restore(view) {
     this.viewer.restoreView(view.state);
     this.active = { name: view.name, state: view.state };
+    this.changed = false;
+    this.updateList();
     // The toolbar shows the material and the lighting of the view
     const material = this.element.querySelector('[data-cad-material-mode]');
     if (material) material.value = this.element.dataset.materialMode;
@@ -165,11 +190,11 @@ export class SavedViews {
                              is_default: this.form.elements.is_default.checked, revision: existing?.revision } };
       const { view } = await this.request('PUT', `${this.url}/${encodeURIComponent(name)}`, body);
       this.active = { name: view.name, state: body.view.state };
+      this.changed = false;
       this.views = this.views.filter((v) => v.name !== view.name)
         .map((v) => (view.is_default ? { ...v, is_default: false } : v))
         .concat(view).sort((a, b) => a.name.localeCompare(b.name));
       this.updateList();
-      this.select.value = view.name;
       this.closeForm();
       this.showStatus(this.i18n.view_saved, 'notice');
     } catch (error) {
@@ -186,6 +211,8 @@ export class SavedViews {
     try {
       await this.request('DELETE', `${this.url}/${encodeURIComponent(view.name)}?revision=${view.revision}`);
       this.views = this.views.filter((v) => v.name !== view.name);
+      this.active = null;
+      this.changed = false;
       this.updateList();
       this.showStatus(this.i18n.view_deleted, 'notice');
     } catch (error) {
@@ -194,11 +221,11 @@ export class SavedViews {
     this.updateButtons();
   }
 
+  // The list shows the active view, or "Changed view" if it has been changed
   updateList() {
-    const value = this.select.value;
-    this.select.replaceChildren(new Option('', ''), ...this.views.map((view) =>
+    this.select.replaceChildren(new Option(this.changed ? this.i18n.view_changed : '', ''), ...this.views.map((view) =>
       new Option(view.is_default ? `${view.name} (${this.i18n.view_default})` : view.name, view.name)));
-    this.select.value = this.views.some((view) => view.name === value) ? value : '';
+    this.select.value = !this.changed && this.selected ? this.selected.name : '';
   }
 
   updateButtons() {
