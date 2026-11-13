@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.3.0 (unreleased)
+## v1.3.0 (2026-11-13)
 * feat: the colors of single faces of STEP models are shown, not only the color of the body #5
 * feat: parts of assemblies (STEP, IGES, BREP) in a panel: show and hide parts, show only one part and fit the view to it; the hidden parts are saved with the view #6
 * feat: section view of 3D models along the X, Y or Z axis with closed cut faces, moved with a slider or the arrow in the view; the section is saved with the view #7

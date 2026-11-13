@@ -41,9 +41,13 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 
 ## 📸 Screenshots
 
-| 3D model (STEP) with a distance measurement | 2D drawing (DWG) |
+| 3D assembly (STEP) with the parts, the world axes and a distance measurement | Section view with closed cut faces |
 | --- | --- |
-| [![3D preview of a STEP assembly with a distance measurement](docs/screenshot-3d.png)](docs/screenshot-3d.png) | [![2D preview of a DWG drawing](docs/screenshot-2d.png)](docs/screenshot-2d.png) |
+| [![3D preview of a STEP assembly with the panel of the parts, the world axes and a distance measurement](docs/screenshot-3d.png)](docs/screenshot-3d.png) | [![Section view of a STEP assembly along the Z axis with closed cut faces](docs/screenshot-section.png)](docs/screenshot-section.png) |
+
+| 2D drawing (DWG) |
+| --- |
+| [![2D preview of a DWG drawing](docs/screenshot-2d.png)](docs/screenshot-2d.png) |
 
 ## ⚙️ Plugin Configuration
 
