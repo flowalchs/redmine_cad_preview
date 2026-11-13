@@ -29,17 +29,18 @@ class CadPreviewSettingsControllerTest < Redmine::ControllerTest
     assert_select 'input[name=?]', 'settings[conversion_timeout]'
     assert_select 'select[name=?] option[selected][value=original]', 'settings[material_mode]'
     assert_select 'select[name=?] option[selected][value=original]', 'settings[lighting]'
+    assert_select 'input[type=checkbox][name=?][value=true][checked]', 'settings[world_axes]'
   end
 
   def test_update_plugin_settings
     post(:plugin, :params => {:id => 'redmine_cad_preview',
                               :settings => {'formats' => ['step', 'dxf', ''], 'max_file_size' => '20',
                                             'conversion_timeout' => '60',
-                                            'material_mode' => 'matte', 'lighting' => 'studio'}})
+                                            'material_mode' => 'matte', 'lighting' => 'studio', 'world_axes' => 'false'}})
     assert_redirected_to '/settings/plugin/redmine_cad_preview'
     assert_equal ['step', 'dxf'], RedmineCadPreview.enabled_formats
     assert_equal 20.megabytes, RedmineCadPreview.max_file_size
     assert_equal 60, RedmineCadPreview::DwgConverter.timeout
-    assert_equal({'material_mode' => 'matte', 'lighting' => 'studio'}, RedmineCadPreview::ViewerOptions.defaults)
+    assert_equal({'material_mode' => 'matte', 'lighting' => 'studio', 'world_axes' => 'false'}, RedmineCadPreview::ViewerOptions.defaults)
   end
 end

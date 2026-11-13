@@ -39,6 +39,7 @@
        data-format="<%= format %>"
        data-material-mode="<%= viewer_options['material_mode'] %>"
        data-lighting="<%= viewer_options['lighting'] %>"
+       data-world-axes="<%= viewer_options['world_axes'] %>"
        data-error="<%= l(:text_cad_preview_error) %>"
        data-filename="<%= attachment.filename %>"
        data-views-url="<%= cad_preview_views_path(attachment) %>"
@@ -96,7 +97,9 @@
                            :id => nil, :title => l(:label_cad_preview_lighting), :data => {:cad_lighting => true} %>
           <% end %>
           <%= button.('box', l(:button_cad_preview_wireframe), 'wireframe') %>
-          <%= button.('axis-x', l(:button_cad_preview_world_axes), 'world-axes', 'aria-pressed': 'true') %>
+          <% axes = viewer_options['world_axes'] == 'true' %>
+          <%= button.('axis-x', l(:button_cad_preview_world_axes), 'world-axes', :css_class => ('selected' if axes),
+                      'aria-pressed': axes.to_s) %>
         </span>
       <% end %>
       <span class="cad-preview-toolbar-group">

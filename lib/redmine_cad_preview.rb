@@ -39,6 +39,7 @@ module RedmineCadPreview
   DEFAULT_SETTINGS = {
     'material_mode' => 'original',
     'lighting' => 'original',
+    'world_axes' => 'true',
     'formats' => FORMATS.keys,
     'max_file_size' => '50',
     'conversion_timeout' => '30'

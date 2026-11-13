@@ -1,6 +1,7 @@
 pl:
   button_cad_preview_fit: "Dopasuj do widoku"
   button_cad_preview_wireframe: "Siatka"
+  button_cad_preview_world_axes: "Osie globalne"
   button_cad_preview_parts: "Części"
   button_cad_preview_show_all_parts: "Pokaż wszystkie"
   label_cad_preview_toggle_part: "Pokaż lub ukryj"

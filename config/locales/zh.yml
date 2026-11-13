@@ -1,6 +1,7 @@
 zh:
   button_cad_preview_fit: "适应视图"
   button_cad_preview_wireframe: "线框"
+  button_cad_preview_world_axes: "世界坐标轴"
   button_cad_preview_parts: "零件"
   button_cad_preview_show_all_parts: "全部显示"
   label_cad_preview_toggle_part: "显示/隐藏"

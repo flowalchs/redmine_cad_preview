@@ -24,7 +24,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
 - **File icons** – 3D models and 2D drawings get their own icons in the attachment lists, from Redmine 7.0 (which shows file type icons there). Redmine 7.0 only passes the content type, so only files with a CAD content type get the icons there, e.g. DWG, DXF, STL and IGES. Redmine trunk also passes the filename, so all CAD files get the icons. Icons of the theme are used first.
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
-- **World axes** – A small X (red), Y (green), Z (blue) orientation indicator in the lower-right corner of 3D views. Visible by default; toggle **World axes** to hide it. Its visibility is saved with the view and respected in PNG/PDF downloads and saved images. The indicator is added after cropping saved images, without retaining empty viewport margins.
+- **World axes** – A small X (red), Y (green), Z (blue) orientation indicator in the lower-right corner of 3D views. Shown by default (plugin setting **World axes**); the **World axes** button of the toolbar shows or hides it. Its visibility is saved with the view and respected in PNG/PDF downloads and saved images. The indicator is added after cropping saved images, without retaining empty viewport margins.
 - **Parts of assemblies** – STEP, IGES and BREP files with several parts show their product tree in a panel: parts and assemblies can be shown and hidden, and clicking a name shows only this part and fits the view to it. The hidden parts are saved with the view.
 - **Colors** – The colors of the bodies and of single faces of STEP models are shown
 - **Section view** – 3D models can be cut along the X, Y or Z axis, with closed cut faces. The plane is moved with a slider or with the arrow in the view, and can be flipped. The section is saved with the view and shown in the PNG and PDF downloads and in the images of the views.
@@ -55,6 +55,7 @@ Configure the plugin under **Administration → Plugins → Redmine CAD Preview 
 | Maximum file size             | Larger files are not previewed (default: 50 MB). The file is loaded and converted to triangles in the browser, which needs a multiple of the file size in memory. On the server, the file is sent like a download, so the limit only matters for the DWG conversion, which runs as a separate process. |
 | Material                      | Material of 3D models when the preview is opened: original or matte (default: original) |
 | Lighting                      | Lighting of 3D models when the preview is opened: original or studio (default: original) |
+| World axes                    | Shows the world axes in 3D views when the preview is opened (default: on). Saved views keep their own setting, views saved before 1.3.0 follow this setting. |
 | Conversion timeout            | Maximum time of a DWG conversion in seconds (default: 30)                   |
 
 The command of the DWG converter is not a plugin setting, so that it cannot be changed in the browser. Like the commands of ImageMagick, Ghostscript and Pandoc, it can be set in `config/configuration.yml` of Redmine. Without it, `dwg2dxf` is found in the `PATH` of Redmine:

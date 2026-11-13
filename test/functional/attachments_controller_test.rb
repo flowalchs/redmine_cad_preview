@@ -40,7 +40,10 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'a.cad-preview-exit-fullscreen[data-cad-action=fullscreen]'
     assert_select 'a[data-cad-action=download-png][title=?]', 'Download (PNG)'
     assert_select 'a[data-cad-action=download-pdf][title=?]', 'Download (PDF)'
-    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 13
+    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 14
+    # World axes, shown by default
+    assert_select 'div.cad-preview[data-world-axes=true]'
+    assert_select 'a.selected[data-cad-action=world-axes][aria-pressed=true]'
     # Section view
     assert_select 'a[data-cad-action=section]'
     assert_select '.cad-preview-section-controls[hidden]' do

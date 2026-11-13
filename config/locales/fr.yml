@@ -1,6 +1,7 @@
 fr:
   button_cad_preview_fit: "Ajuster à la vue"
   button_cad_preview_wireframe: "Fil de fer"
+  button_cad_preview_world_axes: "Axes du monde"
   button_cad_preview_parts: "Pièces"
   button_cad_preview_show_all_parts: "Tout afficher"
   label_cad_preview_toggle_part: "Afficher ou masquer"

@@ -1,6 +1,7 @@
 sv:
   button_cad_preview_fit: "Anpassa till vyn"
   button_cad_preview_wireframe: "Trådmodell"
+  button_cad_preview_world_axes: "Världsaxlar"
   button_cad_preview_parts: "Delar"
   button_cad_preview_show_all_parts: "Visa alla"
   label_cad_preview_toggle_part: "Visa eller dölj"

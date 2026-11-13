@@ -1,6 +1,7 @@
 pt:
   button_cad_preview_fit: "Ajustar à vista"
   button_cad_preview_wireframe: "Estrutura de arame"
+  button_cad_preview_world_axes: "Eixos do mundo"
   button_cad_preview_parts: "Peças"
   button_cad_preview_show_all_parts: "Mostrar tudo"
   label_cad_preview_toggle_part: "Mostrar ou ocultar"

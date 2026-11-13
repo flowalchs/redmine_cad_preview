@@ -108,3 +108,13 @@ test('the section is saved only if the model is cut and restored with the view',
   assert.equal(section, null);
 });
 
+test('views without the world axes follow the default of the viewer', () => {
+  const viewer = fixture();
+  viewer.defaultAxes = false;
+  viewer.setAxesVisible = (value) => { viewer.axesVisible = value; };
+  const state = readView(viewer);
+  delete state.axes;
+  applyView(viewer, state);
+  assert.equal(viewer.axesVisible, false);
+});
+

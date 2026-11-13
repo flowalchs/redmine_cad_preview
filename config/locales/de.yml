@@ -1,6 +1,7 @@
 de:
   button_cad_preview_fit: "Einpassen"
   button_cad_preview_wireframe: "Drahtgitter"
+  button_cad_preview_world_axes: "Weltachsen"
   button_cad_preview_parts: "Teile"
   button_cad_preview_show_all_parts: "Alle anzeigen"
   label_cad_preview_toggle_part: "Ein- oder ausblenden"

@@ -33,6 +33,12 @@ export function opaqueBounds({ data, width, height }) {
 // True if the states show the same view. The aspect of the viewport is
 // ignored, and small differences of numbers are ignored, as restoring a view
 // can change its numbers slightly.
+// A saved view without the world axes (saved before they existed) shows them
+// as the plugin settings say
+export function withDefaults(state, viewer) {
+  return 'defaultAxes' in viewer && !('axes' in state) ? { ...state, axes: viewer.defaultAxes } : state;
+}
+
 export function sameState(a, b) {
   if (typeof a === 'number' && typeof b === 'number') {
     return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b));
@@ -43,8 +49,7 @@ export function sameState(a, b) {
   if (a && b && typeof a === 'object' && typeof b === 'object') {
     const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
     keys.delete('aspect');
-    return [...keys].every((key) => key === 'axes'
-      ? (a[key] !== false) === (b[key] !== false) : sameState(a[key], b[key]));
+    return [...keys].every((key) => sameState(a[key], b[key]));
   }
   return a === b;
 }
@@ -138,14 +143,14 @@ export class SavedViews {
   // Returns the name of the view that was restored or saved last, if the
   // current view has not been changed since then
   unchangedName() {
-    return this.active && sameState(this.viewer.exportView(), this.active.state) ? this.active.name : null;
+    return this.active && sameState(this.viewer.exportView(), withDefaults(this.active.state, this.viewer)) ? this.active.name : null;
   }
 
   // Shows "Changed view" in the list if the view has been changed since it
   // was restored or saved
   checkChanged() {
     if (!this.active) return;
-    const changed = !sameState(this.viewer.exportView(), this.active.state);
+    const changed = !sameState(this.viewer.exportView(), withDefaults(this.active.state, this.viewer));
     if (changed === this.changed) return;
     this.changed = changed;
     this.updateList();

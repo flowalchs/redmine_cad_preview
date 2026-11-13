@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 module RedmineCadPreview
-  # Initial material and lighting of the 3D viewer. The defaults are set in the
+  # Initial material, lighting and world axes of the 3D viewer. The defaults are set in the
   # plugin settings, and other plugins can override them per attachment with a
   # provider. Only the values in CHOICES are used.
   module ViewerOptions
-    DEFAULTS = {'material_mode' => 'original', 'lighting' => 'original'}.freeze
-    CHOICES = {'material_mode' => %w[original matte], 'lighting' => %w[original studio]}.freeze
+    DEFAULTS = {'material_mode' => 'original', 'lighting' => 'original', 'world_axes' => 'true'}.freeze
+    CHOICES = {'material_mode' => %w[original matte], 'lighting' => %w[original studio],
+               'world_axes' => %w[true false]}.freeze
 
     class << self
       # Registers a provider, which returns the options for an attachment, e.g.

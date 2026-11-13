@@ -363,9 +363,12 @@ class ModelViewer {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, stencil: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.canvasContainer.appendChild(this.renderer.domElement);
-    this.axesVisible = true;
+    // The world axes are shown by default, unless the plugin settings say otherwise
+    this.defaultAxes = element.dataset.worldAxes !== 'false';
+    this.axesVisible = this.defaultAxes;
     this.axesCanvas = document.createElement('canvas');
     this.axesCanvas.className = 'cad-preview-world-axes';
+    this.axesCanvas.hidden = !this.axesVisible;
     this.axesCanvas.setAttribute('aria-hidden', 'true');
     this.canvasContainer.appendChild(this.axesCanvas);
 
@@ -523,7 +526,9 @@ class ModelViewer {
   setAxesVisible(visible) {
     this.axesVisible = !!visible;
     this.axesCanvas.hidden = !this.axesVisible;
-    this.element.querySelector('[data-cad-action="world-axes"]')?.setAttribute('aria-pressed', String(this.axesVisible));
+    const button = this.element.querySelector('[data-cad-action="world-axes"]');
+    button?.classList.toggle('selected', this.axesVisible);
+    button?.setAttribute('aria-pressed', String(this.axesVisible));
     this.requestRender();
   }
 
@@ -613,13 +618,20 @@ class ModelViewer {
   render() {
     this.section?.beforeRender();
     this.renderer.render(this.scene, this.camera);
+    if (!this.axesVisible) return;
     const ratio = this.renderer.getPixelRatio();
     const size = Math.max(1, Math.round(Math.min(88, this.canvas.clientWidth, this.canvas.clientHeight) * ratio));
-    this.axesCanvas.width = size;
-    this.axesCanvas.height = size;
-    this.axesCanvas.style.width = `${size / ratio}px`;
-    this.axesCanvas.style.height = `${size / ratio}px`;
-    this.drawAxes(this.axesCanvas.getContext('2d'), size, size, ratio);
+    const context = this.axesCanvas.getContext('2d');
+    // Resizing clears the canvas, otherwise it is cleared before drawing
+    if (this.axesCanvas.width !== size || this.axesCanvas.height !== size) {
+      this.axesCanvas.width = size;
+      this.axesCanvas.height = size;
+      this.axesCanvas.style.width = `${size / ratio}px`;
+      this.axesCanvas.style.height = `${size / ratio}px`;
+    } else {
+      context.clearRect(0, 0, size, size);
+    }
+    this.drawAxes(context, size, size, ratio);
   }
 
   // Draws the current view without background on a 2D context

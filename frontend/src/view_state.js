@@ -39,7 +39,8 @@ export function applyView(viewer, state) {
   viewer.scene.background.set(state.background);
   viewer.setMaterialMode(state.material);
   viewer.setLighting(state.lighting);
-  viewer.setAxesVisible?.(state.axes !== false);
+  // Views saved before the world axes existed follow the plugin settings
+  viewer.setAxesVisible?.(state.axes ?? viewer.defaultAxes ?? true);
   if (viewer.wireframe !== state.wireframe) viewer.toggleWireframe();
   viewer.setHiddenParts?.(state.hidden || []);
   viewer.setSection?.(state.section || null);

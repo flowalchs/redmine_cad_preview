@@ -1,6 +1,7 @@
 nb:
   button_cad_preview_fit: "Tilpass til visning"
   button_cad_preview_wireframe: "Trådramme"
+  button_cad_preview_world_axes: "Verdensakser"
   button_cad_preview_parts: "Deler"
   button_cad_preview_show_all_parts: "Vis alle"
   label_cad_preview_toggle_part: "Vis eller skjul"

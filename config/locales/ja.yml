@@ -1,6 +1,7 @@
 ja:
   button_cad_preview_fit: "全体表示"
   button_cad_preview_wireframe: "ワイヤーフレーム"
+  button_cad_preview_world_axes: "ワールド軸"
   button_cad_preview_parts: "部品"
   button_cad_preview_show_all_parts: "すべて表示"
   label_cad_preview_toggle_part: "表示/非表示"

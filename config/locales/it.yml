@@ -1,6 +1,7 @@
 it:
   button_cad_preview_fit: "Adatta alla vista"
   button_cad_preview_wireframe: "Wireframe"
+  button_cad_preview_world_axes: "Assi del mondo"
   button_cad_preview_parts: "Parti"
   button_cad_preview_show_all_parts: "Mostra tutto"
   label_cad_preview_toggle_part: "Mostra o nascondi"

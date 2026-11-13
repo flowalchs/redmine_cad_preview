@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { opaqueBounds, fitSize, sameState, NAME_PATTERN, captureImage } from '../src/saved_views.js';
+import { opaqueBounds, fitSize, sameState, NAME_PATTERN, captureImage, withDefaults } from '../src/saved_views.js';
 
 // Image data with the given opaque pixels
 function imageData(width, height, opaque) {
@@ -33,8 +33,6 @@ test('axes are composed after cropping, without enlarging model bounds', () => {
       drawAxes(_context, width, height) { drawn = {width, height}; assert.equal(images.length, 1); }});
     assert.equal(result.width, 20); assert.equal(result.height, 30);
     assert.deepEqual(drawn, {width:20, height:30});
-    assert.ok(sameState({axes:true}, {}));
-    assert.ok(!sameState({axes:false}, {}));
   } finally { globalThis.document = original; }
 });
 
@@ -58,4 +56,12 @@ test('same state with small differences and another aspect', () => {
   assert.ok(!sameState(state, { ...state, material: 'matte' }));
   assert.ok(!sameState(state, { ...state, wireframe: true }));
   assert.ok(!sameState(state, { ...state, zoom: 2 }));
+});
+
+test('views saved without the world axes follow the default of the viewer', () => {
+  assert.ok(sameState({ axes: false, zoom: 1 }, withDefaults({ zoom: 1 }, { defaultAxes: false })));
+  assert.ok(!sameState({ axes: false, zoom: 1 }, withDefaults({ zoom: 1 }, { defaultAxes: true })));
+  assert.deepEqual(withDefaults({ axes: true }, { defaultAxes: false }), { axes: true });
+  // Drawings have no world axes
+  assert.deepEqual(withDefaults({ zoom: 1 }, {}), { zoom: 1 });
 });

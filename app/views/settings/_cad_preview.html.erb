@@ -30,6 +30,11 @@
                    options_for_select(RedmineCadPreview::ViewerOptions.choices('lighting'), viewer_defaults['lighting']),
                    :id => 'settings_lighting' %>
   </p>
+  <p>
+    <%= label_tag 'settings_world_axes', l(:button_cad_preview_world_axes) %>
+    <%= hidden_field_tag 'settings[world_axes]', 'false', :id => nil %>
+    <%= check_box_tag 'settings[world_axes]', 'true', viewer_defaults['world_axes'] == 'true', :id => 'settings_world_axes' %>
+  </p>
 </fieldset>
 
 <fieldset class="box">
