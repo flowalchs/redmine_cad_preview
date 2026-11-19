@@ -15,6 +15,8 @@ nb:
   text_cad_preview_conversion_failed: "DWG-filen kunne ikke konverteres for forhåndsvisning. Last den ned i stedet."
   label_cad_preview_formats: "Formater med forhåndsvisning"
   label_cad_preview_max_file_size: "Maksimal filstørrelse"
+  label_cad_preview_compress_files: "Komprimer tekstfiler"
+  text_cad_preview_compress_files: "STEP-, IGES-, DXF-, OBJ- og andre tekstfiler større enn 64 KB sendes gzip-komprimert til nettleseren. Den komprimerte kopien trenger omtrent 20 % ekstra diskplass."
   label_cad_preview_dwg: "DWG-konvertering"
   label_cad_preview_dwg2dxf_command: "dwg2dxf-kommando (LibreDWG)"
   label_cad_preview_conversion_timeout: "Tidsavbrudd for konvertering"

@@ -15,6 +15,8 @@ de:
   text_cad_preview_conversion_failed: "Die DWG-Datei konnte für die Vorschau nicht umgewandelt werden. Bitte stattdessen herunterladen."
   label_cad_preview_formats: "Angezeigte Formate"
   label_cad_preview_max_file_size: "Maximale Dateigröße"
+  label_cad_preview_compress_files: "Textdateien komprimieren"
+  text_cad_preview_compress_files: "STEP-, IGES-, DXF-, OBJ- und andere Textdateien über 64 KB werden gzip-komprimiert an den Browser gesendet. Die komprimierte Kopie braucht etwa 20 % zusätzlichen Speicherplatz."
   label_cad_preview_dwg: "DWG-Umwandlung"
   label_cad_preview_dwg2dxf_command: "dwg2dxf-Befehl (LibreDWG)"
   label_cad_preview_conversion_timeout: "Zeitlimit für die Umwandlung"

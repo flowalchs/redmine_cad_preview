@@ -48,6 +48,22 @@ class CadPreviewCompressionTest < ActiveSupport::TestCase
     assert_equal File.binread(attachment.diskfile), Zlib.gunzip(File.binread(path))
   end
 
+  def test_compressed_copy_should_not_be_made_if_it_is_turned_off
+    RedmineCadPreview::CompressedCopy.stubs(:min_size).returns(0)
+    attachment = nil
+    with_cad_settings('compress_files' => 'false') do
+      attachment = create_attachment_with("DATA;\n" * 1000, 'model.step')
+      assert_nil RedmineCadPreview::CompressedCopy.for(attachment)
+    end
+    assert_not File.exist?(RedmineCadPreview::CompressedCopy.path(attachment))
+  end
+
+  def test_compress_files_should_be_turned_on_without_setting
+    with_settings :plugin_redmine_cad_preview => {} do
+      assert RedmineCadPreview.compress_files?
+    end
+  end
+
   def test_compressed_copy_of_small_file_should_not_be_made
     attachment = create_cad_attachment('model.step')
 

@@ -15,6 +15,13 @@
                        :id => 'settings_max_file_size', :min => 1, :size => 6 %> MB
 </p>
 
+<p>
+  <%= label_tag 'settings_compress_files', l(:label_cad_preview_compress_files) %>
+  <%= hidden_field_tag 'settings[compress_files]', 'false', :id => nil %>
+  <%= check_box_tag 'settings[compress_files]', 'true', RedmineCadPreview.compress_files?, :id => 'settings_compress_files' %>
+  <em class="info"><%= l(:text_cad_preview_compress_files) %></em>
+</p>
+
 <fieldset class="box">
   <legend><%= l(:label_cad_preview_viewer_defaults) %></legend>
   <% viewer_defaults = RedmineCadPreview::ViewerOptions.defaults %>

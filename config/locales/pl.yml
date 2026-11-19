@@ -15,6 +15,8 @@ pl:
   text_cad_preview_conversion_failed: "Nie można przekonwertować pliku DWG do podglądu. Pobierz go zamiast tego."
   label_cad_preview_formats: "Formaty z podglądem"
   label_cad_preview_max_file_size: "Maksymalny rozmiar pliku"
+  label_cad_preview_compress_files: "Kompresuj pliki tekstowe"
+  text_cad_preview_compress_files: "Pliki tekstowe STEP, IGES, DXF, OBJ i inne większe niż 64 KB są wysyłane do przeglądarki skompresowane gzip. Skompresowana kopia wymaga około 20 % dodatkowego miejsca na dysku."
   label_cad_preview_dwg: "Konwersja DWG"
   label_cad_preview_dwg2dxf_command: "Polecenie dwg2dxf (LibreDWG)"
   label_cad_preview_conversion_timeout: "Limit czasu konwersji"

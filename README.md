@@ -57,6 +57,7 @@ Configure the plugin under **Administration → Plugins → Redmine CAD Preview 
 | ----------------------------- | --------------------------------------------------------------------------- |
 | Previewed formats             | Formats shown in the viewer (default: all)                                  |
 | Maximum file size             | Larger files are not previewed (default: 50 MB). The file is loaded and converted to triangles in the browser, which needs a multiple of the file size in memory. On the server, the file is sent like a download, so the limit only matters for the DWG conversion, which runs as a separate process. |
+| Compress text files           | Sends STEP, IGES, DXF, OBJ and other text files larger than 64 KB gzip-compressed to the browser, from a compressed copy that needs about 20 % additional disk space (default: on). Converted DWG files are always stored and sent compressed. |
 | Material                      | Material of 3D models when the preview is opened: original or matte (default: original) |
 | Lighting                      | Lighting of 3D models when the preview is opened: original or studio (default: original) |
 | World axes                    | Shows the world axes in 3D views when the preview is opened (default: on). Saved views keep their own setting, views saved before 1.3.0 follow this setting. |
@@ -127,7 +128,7 @@ dwg2dxf --version
 
 The converted files and the images for the thumbnails are stored in `files/derived_cache/cad_previews` and deleted together with the attachment.
 
-The converted DXF files are stored gzip-compressed, as they are several times larger than the DWG files, and are sent compressed to the browser (`Content-Encoding: gzip`). Attachments in text formats (STEP, IGES, BREP, DXF, OBJ, ASCII STL and PLY, glTF, COLLADA, VRML, AMF) larger than 64 KB are compressed once as well, after the upload or when they are opened for the first time, so that they are downloaded faster. The web server does not need to be configured for it. DXF files converted by earlier versions are compressed when they are opened.
+The converted DXF files are stored gzip-compressed, as they are several times larger than the DWG files, and are sent compressed to the browser (`Content-Encoding: gzip`). Attachments in text formats (STEP, IGES, BREP, DXF, OBJ, ASCII STL and PLY, glTF, COLLADA, VRML, AMF) larger than 64 KB are compressed once as well, after the upload or when they are opened for the first time, so that they are downloaded faster; the compressed copies need about 20 % additional disk space and can be turned off in the plugin settings (*Compress text files*). The web server does not need to be configured for it. DXF files converted by earlier versions are compressed when they are opened.
 
 The conversion runs as an Active Job. With the default queue adapter of Redmine, it runs in the background of the Redmine process.
 

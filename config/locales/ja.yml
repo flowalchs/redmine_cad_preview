@@ -15,6 +15,8 @@ ja:
   text_cad_preview_conversion_failed: "プレビュー用にDWGファイルを変換できませんでした。代わりにダウンロードしてください。"
   label_cad_preview_formats: "プレビューする形式"
   label_cad_preview_max_file_size: "最大ファイルサイズ"
+  label_cad_preview_compress_files: "テキストファイルを圧縮"
+  text_cad_preview_compress_files: "64 KBを超えるSTEP、IGES、DXF、OBJなどのテキストファイルはgzipで圧縮してブラウザに送信されます。圧縮コピーには約20 %の追加ディスク容量が必要です。"
   label_cad_preview_dwg: "DWG変換"
   label_cad_preview_dwg2dxf_command: "dwg2dxfコマンド (LibreDWG)"
   label_cad_preview_conversion_timeout: "変換のタイムアウト"

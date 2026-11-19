@@ -52,6 +52,20 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
     assert_equal "DATA;\n" * 1000, response.body
   end
 
+  def test_file_should_send_the_attachment_if_compression_is_turned_off
+    RedmineCadPreview::CompressedCopy.stubs(:min_size).returns(0)
+    attachment = create_attachment_with("DATA;\n" * 1000, 'model.step')
+    @request.session[:user_id] = 2
+    @request.headers['Accept-Encoding'] = 'gzip'
+
+    with_cad_settings('compress_files' => 'false') do
+      get(:file, :params => {:id => attachment.id})
+    end
+    assert_response :success
+    assert_nil response.headers['Content-Encoding']
+    assert_equal "DATA;\n" * 1000, response.body
+  end
+
   def test_compressed_and_plain_file_should_have_different_etags
     RedmineCadPreview::CompressedCopy.stubs(:min_size).returns(0)
     attachment = create_attachment_with("DATA;\n" * 1000, 'model.step')

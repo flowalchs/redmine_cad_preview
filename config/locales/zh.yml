@@ -15,6 +15,8 @@ zh:
   text_cad_preview_conversion_failed: "无法为预览转换 DWG 文件,请下载。"
   label_cad_preview_formats: "预览的格式"
   label_cad_preview_max_file_size: "最大文件大小"
+  label_cad_preview_compress_files: "压缩文本文件"
+  text_cad_preview_compress_files: "大于 64 KB 的 STEP、IGES、DXF、OBJ 等文本文件会以 gzip 压缩后发送到浏览器。压缩副本大约需要额外 20 % 的磁盘空间。"
   label_cad_preview_dwg: "DWG 转换"
   label_cad_preview_dwg2dxf_command: "dwg2dxf 命令 (LibreDWG)"
   label_cad_preview_conversion_timeout: "转换超时"
