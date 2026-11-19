@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+* perf: converted DWG files and attachments in text formats (STEP, IGES, DXF, OBJ...) larger than 64 KB are sent gzip-compressed to the browser, which makes the download of large drawings several times smaller (e.g. 22 instead of 210 MB) #10
+* perf: converted DWG files are stored gzip-compressed, which takes much less disk space; files converted by earlier versions are compressed when they are opened #10
+* feat: the files of the viewer are sent with the content type of the format (e.g. `model/step`, `image/vnd.dxf`) instead of `application/octet-stream` #10
+
 ## v1.3.0 (2026-11-13)
 * feat: the colors of single faces of STEP models are shown, not only the color of the body #5
 * feat: parts of assemblies (STEP, IGES, BREP) in a panel: show and hide parts, show only one part and fit the view to it; the hidden parts are saved with the view #6

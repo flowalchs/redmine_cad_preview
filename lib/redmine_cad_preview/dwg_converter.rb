@@ -4,6 +4,7 @@ require 'fileutils'
 require 'json'
 require 'shellwords'
 require 'timeout'
+require 'zlib'
 
 module RedmineCadPreview
   # Converts DWG files to DXF with LibreDWG (dwg2dxf), like the markdownized
@@ -12,9 +13,14 @@ module RedmineCadPreview
   # The conversion runs in the background after the upload (see
   # CadPreviewJob). Its state is kept in files next to the converted file:
   #
-  #   <digest>_<filesize>.dxf     the converted file
+  #   <digest>_<filesize>.dxf.gz  the converted file, gzip-compressed
   #   <digest>_<filesize>.failed  the number of failed attempts
   #   <digest>_<filesize>.lock    a conversion is running
+  #
+  # The converted file is kept compressed, as it is much larger than the DWG
+  # file and is sent compressed to the browser (see Compression). Files
+  # converted by earlier versions (<digest>_<filesize>.dxf) are compressed
+  # when they are used.
   #
   # A failed conversion is attempted at most MAX_ATTEMPTS times, so that
   # opening the preview does not start a new conversion every time.
@@ -26,20 +32,34 @@ module RedmineCadPreview
     end
 
     def self.cache_path(attachment)
-      File.join(storage_path, "#{attachment.digest}_#{attachment.filesize}.dxf")
+      "#{base_path(attachment)}.dxf.gz"
+    end
+
+    # The uncompressed file converted by earlier versions
+    def self.legacy_path(attachment)
+      "#{base_path(attachment)}.dxf"
     end
 
     def self.failure_path(attachment)
-      cache_path(attachment).sub(/\.dxf\z/, '.failed')
+      "#{base_path(attachment)}.failed"
     end
 
     def self.lock_path(attachment)
-      cache_path(attachment).sub(/\.dxf\z/, '.lock')
+      "#{base_path(attachment)}.lock"
+    end
+
+    def self.base_path(attachment)
+      File.join(storage_path, "#{attachment.digest}_#{attachment.filesize}")
+    end
+
+    # Returns the path of the converted file (compressed or not), or nil
+    def self.converted_path(attachment)
+      [cache_path(attachment), legacy_path(attachment)].find {|path| File.file?(path)}
     end
 
     # Returns :converted, :converting, :failed or :pending
     def self.state(attachment)
-      if File.file?(cache_path(attachment))
+      if converted_path(attachment)
         :converted
       elsif locked?(attachment)
         :converting
@@ -61,7 +81,7 @@ module RedmineCadPreview
     def self.dxf_for(attachment)
       case state(attachment)
       when :converted
-        cache_path(attachment)
+        compress_legacy(attachment) || converted_path(attachment)
       when :pending
         convert_attachment(attachment)
       end
@@ -88,6 +108,8 @@ module RedmineCadPreview
       end
     end
 
+    # Converts the DWG file to the target file, which is compressed if its
+    # name ends with .gz
     def self.convert(source, target)
       return nil unless available? && File.file?(source)
 
@@ -102,8 +124,15 @@ module RedmineCadPreview
         return nil
       end
 
-      File.rename(temporary, target)
+      if Compression.compressed?(target)
+        Compression.compress(temporary, target)
+      else
+        File.rename(temporary, target)
+      end
       target
+    rescue SystemCallError, Zlib::Error => e
+      logger.error("Could not save the converted DWG file #{target}: #{e.message}")
+      nil
     ensure
       FileUtils.rm_f(temporary) if temporary
     end
@@ -131,7 +160,8 @@ module RedmineCadPreview
 
     # Removes the converted file and the state files of the attachment
     def self.delete(attachment)
-      FileUtils.rm_f([cache_path(attachment), failure_path(attachment), lock_path(attachment)])
+      FileUtils.rm_f([cache_path(attachment), legacy_path(attachment), failure_path(attachment),
+                      lock_path(attachment)])
     end
 
     # Returns true if the configured command can be run. The result is cached
@@ -188,6 +218,29 @@ module RedmineCadPreview
       false
     end
     private_class_method :acquire_lock
+
+    # Compresses a file converted by an earlier version. Returns the path of
+    # the compressed file, or nil if there is nothing to compress or another
+    # process is compressing it.
+    def self.compress_legacy(attachment)
+      legacy = legacy_path(attachment)
+      return nil if File.file?(cache_path(attachment)) || !File.file?(legacy)
+
+      lock = lock_path(attachment)
+      return nil unless acquire_lock(lock)
+
+      begin
+        Compression.compress(legacy, cache_path(attachment))
+        FileUtils.rm_f(legacy)
+        cache_path(attachment)
+      ensure
+        FileUtils.rm_f(lock)
+      end
+    rescue StandardError => e
+      logger.error("Could not compress #{legacy}: #{e.message}")
+      nil
+    end
+    private_class_method :compress_legacy
 
     def self.record_failure(attachment)
       attempts = failed_attempts(attachment) + 1

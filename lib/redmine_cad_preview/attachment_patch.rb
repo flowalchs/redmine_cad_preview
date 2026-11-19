@@ -65,6 +65,7 @@ module RedmineCadPreview
     def delete_cad_preview
       RedmineCadPreview::DwgConverter.delete(self)
       RedmineCadPreview::PreviewImage.delete(self)
+      RedmineCadPreview::CompressedCopy.delete(self)
     rescue StandardError => e
       Rails.logger.error("Could not remove CAD preview for #{disk_filename}: #{e.message}")
     end
