@@ -20,8 +20,56 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
 
     get(:file, :params => {:id => attachment.id})
     assert_response :success
-    assert_equal 'application/octet-stream', response.media_type
+    assert_equal 'model/step', response.media_type
+    assert_nil response.headers['Content-Encoding']
     assert_equal File.binread(File.join(FIXTURES_DIR, 'model.step')), response.body
+  end
+
+  def test_file_should_send_the_compressed_copy_if_gzip_is_accepted
+    RedmineCadPreview::CompressedCopy.stubs(:min_size).returns(0)
+    attachment = create_attachment_with("DATA;\n" * 1000, 'model.step')
+    @request.session[:user_id] = 2
+    @request.headers['Accept-Encoding'] = 'gzip, deflate, br'
+
+    get(:file, :params => {:id => attachment.id})
+    assert_response :success
+    assert_equal 'gzip', response.headers['Content-Encoding']
+    assert_equal 'Accept-Encoding', response.headers['Vary']
+    assert_equal 'model/step', response.media_type
+    assert_equal "DATA;\n" * 1000, Zlib.gunzip(response.body)
+  end
+
+  def test_file_should_send_the_attachment_if_gzip_is_not_accepted
+    RedmineCadPreview::CompressedCopy.stubs(:min_size).returns(0)
+    attachment = create_attachment_with("DATA;\n" * 1000, 'model.step')
+    @request.session[:user_id] = 2
+    @request.headers['Accept-Encoding'] = 'identity'
+
+    get(:file, :params => {:id => attachment.id})
+    assert_response :success
+    assert_nil response.headers['Content-Encoding']
+    assert_equal 'Accept-Encoding', response.headers['Vary']
+    assert_equal "DATA;\n" * 1000, response.body
+  end
+
+  def test_compressed_and_plain_file_should_have_different_etags
+    RedmineCadPreview::CompressedCopy.stubs(:min_size).returns(0)
+    attachment = create_attachment_with("DATA;\n" * 1000, 'model.step')
+    @request.session[:user_id] = 2
+
+    @request.headers['Accept-Encoding'] = 'gzip'
+    get(:file, :params => {:id => attachment.id})
+    gzip_etag = response.headers['ETag']
+
+    @request.headers['Accept-Encoding'] = 'identity'
+    @request.headers['If-None-Match'] = gzip_etag
+    get(:file, :params => {:id => attachment.id})
+    assert_response :success
+    assert_not_equal gzip_etag, response.headers['ETag']
+
+    @request.headers['If-None-Match'] = response.headers['ETag']
+    get(:file, :params => {:id => attachment.id})
+    assert_response :not_modified
   end
 
   def test_file_should_not_increase_the_download_counter
@@ -106,12 +154,45 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
     attachment = create_cad_attachment('drawing.dwg')
     @request.session[:user_id] = 2
 
+    @request.headers['Accept-Encoding'] = 'gzip'
+
     with_fake_dwg2dxf do
       get(:dxf, :params => {:id => attachment.id})
     end
     assert_response :success
-    assert_equal File.binread(File.join(FIXTURES_DIR, 'drawing.dwg')), response.body
+    assert_equal 'gzip', response.headers['Content-Encoding']
+    assert_equal 'Accept-Encoding', response.headers['Vary']
+    assert_equal 'image/vnd.dxf', response.media_type
+    assert_equal File.binread(File.join(FIXTURES_DIR, 'drawing.dwg')), Zlib.gunzip(response.body)
     assert_match 'drawing.dxf', response.headers['Content-Disposition']
+  end
+
+  def test_dxf_should_be_uncompressed_if_gzip_is_not_accepted
+    attachment = create_cad_attachment('drawing.dwg')
+    @request.session[:user_id] = 2
+
+    with_fake_dwg2dxf do
+      get(:dxf, :params => {:id => attachment.id})
+    end
+    assert_response :success
+    assert_nil response.headers['Content-Encoding']
+    # The body is uncompressed while it is sent
+    assert_equal File.binread(File.join(FIXTURES_DIR, 'drawing.dwg')), response.stream.to_enum(:each).to_a.join
+    assert_match 'drawing.dxf', response.headers['Content-Disposition']
+  end
+
+  def test_dxf_converted_by_an_earlier_version_should_be_sent_compressed
+    attachment = create_cad_attachment('drawing.dwg')
+    legacy = RedmineCadPreview::DwgConverter.legacy_path(attachment)
+    FileUtils.mkdir_p(File.dirname(legacy))
+    File.write(legacy, 'converted')
+    @request.session[:user_id] = 2
+    @request.headers['Accept-Encoding'] = 'gzip'
+
+    get(:dxf, :params => {:id => attachment.id})
+    assert_response :success
+    assert_equal 'converted', Zlib.gunzip(response.body)
+    assert_not File.exist?(legacy)
   end
 
   def test_dxf_with_failing_conversion_should_return_422

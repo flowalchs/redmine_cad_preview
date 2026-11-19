@@ -29,6 +29,22 @@ module RedmineCadPreview
     'solidworks' => %w[.sldprt .sldasm .slddrw]
   }.freeze
 
+  # Content types of the files sent to the viewer. Other formats are sent as
+  # application/octet-stream.
+  CONTENT_TYPES = {
+    'step' => 'model/step',
+    'iges' => 'model/iges',
+    'stl' => 'model/stl',
+    'obj' => 'model/obj',
+    '3mf' => 'model/3mf',
+    'gltf' => 'model/gltf+json',
+    'glb' => 'model/gltf-binary',
+    'dae' => 'model/vnd.collada+xml',
+    'vrml' => 'model/vrml',
+    'dxf' => 'image/vnd.dxf',
+    'dwg' => 'image/vnd.dwg'
+  }.freeze
+
   # Formats read with OpenCASCADE (occt-import-js) in the browser
   OCCT_FORMATS = %w[step iges brep freecad].freeze
 
@@ -66,6 +82,10 @@ module RedmineCadPreview
     def format_of(filename)
       extension = File.extname(filename.to_s).downcase
       FORMATS.find {|_, extensions| extensions.include?(extension)}&.first
+    end
+
+    def content_type_of(filename)
+      CONTENT_TYPES[format_of(filename)] || 'application/octet-stream'
     end
 
     def previewable?(attachment)

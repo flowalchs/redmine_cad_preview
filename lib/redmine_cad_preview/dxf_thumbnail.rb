@@ -11,7 +11,8 @@ module RedmineCadPreview
     BMP = 2
     PNG = 6
 
-    # Returns the image (BMP or PNG) of the DXF file, or nil
+    # Returns the image (BMP or PNG) of the DXF file, or nil. The file can be
+    # gzip-compressed (converted DWG files).
     def self.extract(path)
       data = read_section(path)
       return nil if data.empty?
@@ -29,7 +30,7 @@ module RedmineCadPreview
     def self.read_section(path)
       hex = +''
       inside = false
-      File.open(path, 'rb') do |file|
+      Compression.open(path) do |file|
         file.each_line.each_slice(2) do |code, value|
           code = code.strip
           value = value.to_s.strip

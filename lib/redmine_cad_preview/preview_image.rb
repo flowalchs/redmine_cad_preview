@@ -101,7 +101,7 @@ module RedmineCadPreview
       # LibreDWG copies the image of a DWG file to the converted DXF file
       def read_dwg_thumbnail(attachment)
         case DwgConverter.state(attachment)
-        when :converted then DxfThumbnail.extract(DwgConverter.cache_path(attachment))
+        when :converted then DxfThumbnail.extract(DwgConverter.converted_path(attachment))
         when :failed then nil
         else :later
         end

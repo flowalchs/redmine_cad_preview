@@ -52,6 +52,20 @@ module RedmineCadPreview
       without_dwg2dxf(&create)
     end
 
+    # Creates an attachment with the given content
+    def create_attachment_with(data, filename)
+      file = Tempfile.new(['cad', File.extname(filename)])
+      file.binmode
+      file.write(data)
+      file.close
+      Attachment.create!(
+        :container => Issue.find(1), :author => User.find(1),
+        :file => Rack::Test::UploadedFile.new(file.path, 'application/octet-stream', :original_filename => filename)
+      )
+    ensure
+      file&.unlink
+    end
+
     def without_dwg2dxf(&)
       RedmineCadPreview::DwgConverter.reset_availability!
       with_dwg2dxf_command('/nonexistent/dwg2dxf', &)

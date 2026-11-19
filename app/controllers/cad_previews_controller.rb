@@ -7,16 +7,22 @@ class CadPreviewsController < ApplicationController
   before_action :find_attachment, :authorize_attachment
   before_action :authorize_snapshot, :only => :snapshot
 
-  # Sends the attachment
+  # Sends the attachment, or its compressed copy (text formats)
   def file
-    send_cad_file @attachment.diskfile, @attachment.filename
+    send_cad_file @attachment.filename, :plain => @attachment.diskfile,
+                                        :compressed => RedmineCadPreview::CompressedCopy.for(@attachment)
   end
 
   # Sends the DXF file converted from a DWG attachment
   def dxf
     path = RedmineCadPreview::DwgConverter.dxf_for(@attachment)
     if path
-      send_cad_file path, "#{File.basename(@attachment.filename, '.*')}.dxf"
+      filename = "#{File.basename(@attachment.filename, '.*')}.dxf"
+      if RedmineCadPreview::Compression.compressed?(path)
+        send_cad_file filename, :compressed => path
+      else
+        send_cad_file filename, :plain => path
+      end
     else
       render_error :status => 422, :message => l(:text_cad_preview_conversion_failed)
     end
@@ -66,9 +72,25 @@ class CadPreviewsController < ApplicationController
     @attachment.visible? ? true : deny_access
   end
 
-  def send_cad_file(path, filename)
-    if stale?(:etag => @attachment.digest, :template => false)
-      send_file path, :filename => filename, :type => 'application/octet-stream', :disposition => 'attachment'
+  # Sends the compressed file with Content-Encoding: gzip if the client
+  # accepts it, and the plain file otherwise. Without plain file, the
+  # compressed file is uncompressed while it is sent.
+  def send_cad_file(filename, plain: nil, compressed: nil)
+    options = {:filename => filename, :type => RedmineCadPreview.content_type_of(filename),
+               :disposition => 'attachment'}
+    gzip = compressed && RedmineCadPreview::Compression.accepts_gzip?(request.headers['Accept-Encoding'])
+    response.headers['Vary'] = 'Accept-Encoding' if compressed
+    # The compressed and the plain file must not be mixed up in caches
+    return unless stale?(:etag => gzip ? [@attachment.digest, 'gzip'] : @attachment.digest, :template => false)
+
+    if gzip
+      response.headers['Content-Encoding'] = 'gzip'
+      send_file compressed, options
+    elsif plain
+      send_file plain, options
+    else
+      send_file_headers! options
+      self.response_body = RedmineCadPreview::Compression::UncompressedBody.new(compressed)
     end
   end
 end

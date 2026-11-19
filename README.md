@@ -127,6 +127,8 @@ dwg2dxf --version
 
 The converted files and the images for the thumbnails are stored in `files/derived_cache/cad_previews` and deleted together with the attachment.
 
+The converted DXF files are stored gzip-compressed, as they are several times larger than the DWG files, and are sent compressed to the browser (`Content-Encoding: gzip`). Attachments in text formats (STEP, IGES, BREP, DXF, OBJ, ASCII STL and PLY, glTF, COLLADA, VRML, AMF) larger than 64 KB are compressed once as well, after the upload or when they are opened for the first time, so that they are downloaded faster. The web server does not need to be configured for it. DXF files converted by earlier versions are compressed when they are opened.
+
 The conversion runs as an Active Job. With the default queue adapter of Redmine, it runs in the background of the Redmine process.
 
 ## ⚠️ Limitations

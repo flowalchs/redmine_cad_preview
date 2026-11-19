@@ -19,12 +19,41 @@ class CadPreviewDwgConverterTest < ActiveSupport::TestCase
     with_fake_dwg2dxf do
       path = RedmineCadPreview::DwgConverter.dxf_for(attachment)
       assert_equal RedmineCadPreview::DwgConverter.cache_path(attachment), path
-      assert File.file?(path)
+      assert path.end_with?('.dxf.gz')
+      # The converted file is kept compressed only
+      assert_equal File.binread(File.join(FIXTURES_DIR, 'drawing.dwg')), Zlib.gunzip(File.binread(path))
+      assert_not File.exist?(RedmineCadPreview::DwgConverter.legacy_path(attachment))
+      assert_empty Dir.glob(File.join(RedmineCadPreview::DwgConverter.storage_path, '*.tmp*'))
     end
     # The cached file is used without converting again
     with_fake_dwg2dxf(:mode => 'fail') do
       assert RedmineCadPreview::DwgConverter.dxf_for(attachment)
     end
+  end
+
+  def test_file_converted_by_an_earlier_version_should_be_compressed_when_it_is_used
+    attachment = create_cad_attachment('drawing.dwg')
+    legacy = RedmineCadPreview::DwgConverter.legacy_path(attachment)
+    FileUtils.mkdir_p(File.dirname(legacy))
+    File.write(legacy, 'converted')
+    assert_equal :converted, RedmineCadPreview::DwgConverter.state(attachment)
+
+    with_fake_dwg2dxf(:mode => 'fail') do
+      path = RedmineCadPreview::DwgConverter.dxf_for(attachment)
+      assert_equal RedmineCadPreview::DwgConverter.cache_path(attachment), path
+      assert_equal 'converted', Zlib.gunzip(File.binread(path))
+    end
+    assert_not File.exist?(legacy)
+  end
+
+  def test_file_converted_by_an_earlier_version_should_be_used_while_it_is_compressed
+    attachment = create_cad_attachment('drawing.dwg')
+    legacy = RedmineCadPreview::DwgConverter.legacy_path(attachment)
+    FileUtils.mkdir_p(File.dirname(legacy))
+    File.write(legacy, 'converted')
+    FileUtils.touch(RedmineCadPreview::DwgConverter.lock_path(attachment))
+
+    assert_equal legacy, RedmineCadPreview::DwgConverter.dxf_for(attachment)
   end
 
   def test_failing_conversion_should_return_nil
@@ -129,9 +158,11 @@ class CadPreviewDwgConverterTest < ActiveSupport::TestCase
     assert File.file?(path)
 
     File.write(RedmineCadPreview::DwgConverter.failure_path(attachment), '{"attempts":1}')
+    File.write(RedmineCadPreview::DwgConverter.legacy_path(attachment), 'converted')
 
     attachment.destroy
     assert_not File.exist?(path)
+    assert_not File.exist?(RedmineCadPreview::DwgConverter.legacy_path(attachment))
     assert_not File.exist?(RedmineCadPreview::DwgConverter.failure_path(attachment))
   end
 
