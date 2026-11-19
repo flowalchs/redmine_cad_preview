@@ -189,7 +189,10 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 2
     @request.headers['Accept-Encoding'] = 'gzip'
 
-    get(:dxf, :params => {:id => attachment.id})
+    # The file is not converted again
+    with_fake_dwg2dxf(:mode => 'fail') do
+      get(:dxf, :params => {:id => attachment.id})
+    end
     assert_response :success
     assert_equal 'converted', Zlib.gunzip(response.body)
     assert_not File.exist?(legacy)
