@@ -58,6 +58,7 @@ module RedmineCadPreview
     'world_axes' => 'true',
     'formats' => FORMATS.keys,
     'max_file_size' => '50',
+    'compress_files' => 'true',
     'conversion_timeout' => '30'
   }.freeze
 
@@ -82,6 +83,12 @@ module RedmineCadPreview
     def format_of(filename)
       extension = File.extname(filename.to_s).downcase
       FORMATS.find {|_, extensions| extensions.include?(extension)}&.first
+    end
+
+    # Attachments in text formats get a compressed copy that is sent to the
+    # browser (see CompressedCopy)
+    def compress_files?
+      settings['compress_files'] != 'false'
     end
 
     def content_type_of(filename)

@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-* perf: converted DWG files and attachments in text formats (STEP, IGES, DXF, OBJ...) larger than 64 KB are sent gzip-compressed to the browser, which makes the download of large drawings several times smaller (e.g. 22 instead of 210 MB) #10
+* perf: converted DWG files and attachments in text formats (STEP, IGES, DXF, OBJ...) larger than 64 KB are sent gzip-compressed to the browser, which makes the download of large drawings several times smaller (e.g. 22 instead of 210 MB); the compressed copies of the attachments can be turned off in the plugin settings #10
 * perf: converted DWG files are stored gzip-compressed, which takes much less disk space; files converted by earlier versions are compressed when they are opened #10
 * feat: the files of the viewer are sent with the content type of the format (e.g. `model/step`, `image/vnd.dxf`) instead of `application/octet-stream` #10
 

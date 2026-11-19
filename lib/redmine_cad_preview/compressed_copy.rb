@@ -5,6 +5,7 @@ require 'fileutils'
 module RedmineCadPreview
   # gzip-compressed copies of attachments in text formats, sent to the
   # browsers that accept gzip instead of the attachment (see Compression).
+  # They can be turned off in the plugin settings (compress_files).
   # They are kept next to the converted DWG files:
   #
   #   <digest>_<filesize>.file.gz     the compressed attachment
@@ -30,7 +31,8 @@ module RedmineCadPreview
       end
 
       def candidate?(attachment)
-        FORMATS.include?(RedmineCadPreview.format_of(attachment.filename)) && attachment.filesize.to_i >= min_size
+        RedmineCadPreview.compress_files? &&
+          FORMATS.include?(RedmineCadPreview.format_of(attachment.filename)) && attachment.filesize.to_i >= min_size
       end
 
       # Returns the path of the compressed copy of the attachment, and creates
