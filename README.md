@@ -34,8 +34,9 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Macro** – Shows the viewer of an attachment in wiki pages, issues, documents and news, with a saved view, all saved views, or the images of the views (see [Macro](#-macro))
 - **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library. The file name contains the name of the saved view if the view has not been changed.
 - **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
+- **Fast loading of large files** – Converted DWG files and text files larger than 64 KB (STEP, IGES, DXF, OBJ...) are sent gzip-compressed to the browser, without configuring the web server (e.g. 22 instead of 210 MB for a large drawing). Converted DWG files are also stored compressed. The compressed copies of the text files can be turned off in the plugin settings.
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
-- **Settings** – Previewed formats, maximum file size, default material and lighting, DWG conversion timeout
+- **Settings** – Previewed formats, maximum file size, compression of text files, default material, lighting and world axes, DWG conversion timeout
 - **API for other plugins** – Other plugins can set the material and lighting of an attachment, read and save the views of attachments in Ruby or with the REST API, and save and restore the view of the viewer in JavaScript (see [API for other plugins](#-api-for-other-plugins))
 - **No additional gems**
 
